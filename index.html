@@ -398,8 +398,23 @@ const DEFAULT_BALANCES = {
 };
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
-function loadLog()  { try{return JSON.parse(localStorage.getItem('mes_pnl_log_v2')||'[]');}catch{return[];} }
-function loadBal()  { try{return JSON.parse(localStorage.getItem('mes_balances_v2')||'{}');}catch{return{};} }
+function loadLog() {
+  try { return JSON.parse(localStorage.getItem('mes_pnl_log_v2') || '[]'); } catch { return []; }
+}
+function loadBal() {
+  try {
+    // Migrate from v1 if v2 is empty
+    const v2 = localStorage.getItem('mes_balances_v2');
+    if (v2) return JSON.parse(v2);
+    const v1 = localStorage.getItem('mes_balances_v1');
+    if (v1) {
+      const migrated = JSON.parse(v1);
+      localStorage.setItem('mes_balances_v2', JSON.stringify(migrated));
+      return migrated;
+    }
+    return {};
+  } catch { return {}; }
+}
 function saveLog(d) { localStorage.setItem('mes_pnl_log_v2', JSON.stringify(d)); }
 function saveBal(d) { localStorage.setItem('mes_balances_v2', JSON.stringify(d)); }
 
@@ -434,10 +449,14 @@ function applyPnlToBalances(entries) {
     if (e.pnl === 0) return;
     const a = ACCOUNTS.find(x => x.id === e.accountId);
     if (!a) return;
-    const curBal = getBal(a);
-    balStore[a.id] = { balance: Math.round((curBal + e.pnl) * 100) / 100, ts: now, source: 'log' };
+    // Always read current balance fresh from balStore or default
+    const curBal = balStore[a.id] ? balStore[a.id].balance : DEFAULT_BALANCES[a.id];
+    const newBal = Math.round((curBal + e.pnl) * 100) / 100;
+    balStore[a.id] = { balance: newBal, ts: now, source: 'log' };
   });
+  // Persist and reload to ensure in-memory state is fresh
   saveBal(balStore);
+  balStore = loadBal();
 }
 
 // Progress toward current milestone
