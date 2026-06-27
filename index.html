@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MES Trading Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+:root {
+  --bg:#0d0f14; --surface-1:#13161d; --surface-2:#1a1e27;
+  --border:#252932; --border-hi:#333a47;
+  --text-1:#e8eaf0; --text-2:#9ba3b2; --text-3:#5c6372;
+  --green:#3dd68c; --green-bg:#0d2b1e; --green-dim:#1a4030;
+  --amber:#f5a623; --amber-bg:#2b1f08;
+  --blue:#5b8ef0; --blue-bg:#0d1a33;
+  --red:#f05b5b; --red-bg:#2b0d0d;
+  --mono:'JetBrains Mono',monospace; --sans:'Inter',system-ui,sans-serif;
+  --radius:8px; --radius-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:220px;min-width:220px;background:var(--surface-1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0;position:fixed;top:0;left:0;bottom:0;z-index:10;}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.logo-main{font-size:15px;font-weight:600;letter-spacing:-0.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);margin-top:3px;font-family:var(--mono);}
+.nav-section{padding:0 12px;margin-bottom:8px;}
+.nav-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;padding:0 8px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);font-size:13px;color:var(--text-2);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;transition:all .12s;}
+.nav-item:hover{background:var(--surface-2);color:var(--text-1);}
+.nav-item.active{background:var(--blue-bg);color:var(--blue);}
+.nav-icon{font-size:15px;width:18px;text-align:center;}
+.nav-badge{margin-left:auto;font-size:10px;background:var(--green-bg);color:var(--green);padding:1px 6px;border-radius:10px;font-family:var(--mono);}
+.sidebar-footer{margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--border);font-size:11px;color:var(--text-3);line-height:1.6;}
+.main{margin-left:220px;flex:1;padding:28px 32px;}
+.page{display:none;}.page.active{display:block;}
+.page-header{margin-bottom:24px;}
+.page-header h1{font-size:20px;font-weight:600;letter-spacing:-0.4px;}
+.page-header p{font-size:13px;color:var(--text-3);margin-top:4px;}
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px;}
+.kpi-card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
+.k-label{font-size:11px;color:var(--text-3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.k-value{font-size:22px;font-weight:500;font-family:var(--mono);}
+.k-value.green{color:var(--green);}.k-value.red{color:var(--red);}.k-value.amber{color:var(--amber);}.k-value.blue{color:var(--blue);}
+.k-sub{font-size:11px;color:var(--text-3);margin-top:4px;}
+.section{margin-bottom:28px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.section-title{font-size:12px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border-hi);background:transparent;color:var(--text-2);cursor:pointer;transition:all .12s;}
+.chip:hover{border-color:var(--blue);color:var(--text-1);}
+.chip.active{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);}
+
+/* Accounts table - no truncation on account column */
+.accounts-wrap{overflow-x:auto;}
+.accounts-table{width:100%;border-collapse:separate;border-spacing:0 4px;min-width:1000px;}
+.accounts-table thead th{font-size:11px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px 8px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.accounts-table thead th.right{text-align:right;}
+.accounts-table tbody tr{background:var(--surface-1);}
+.accounts-table tbody tr:hover{background:var(--surface-2);}
+.accounts-table tbody td{padding:10px 12px;font-size:13px;}
+.accounts-table tbody td:first-child{border-radius:var(--radius) 0 0 var(--radius);}
+.accounts-table tbody td:last-child{border-radius:0 var(--radius) var(--radius) 0;}
+.td-firm{font-size:12px;color:var(--text-3);white-space:nowrap;}
+.td-id{font-family:var(--mono);font-size:12px;color:var(--text-2);white-space:nowrap;} /* no truncation */
+.td-balance{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;white-space:nowrap;}
+.td-logged{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;white-space:nowrap;}
+.td-logged.pos{color:var(--green);}.td-logged.neg{color:var(--red);}
+.td-drift{font-family:var(--mono);font-size:12px;text-align:right;white-space:nowrap;}
+.td-drift.pos{color:var(--green);}.td-drift.neg{color:var(--red);}.td-drift.zero{color:var(--text-3);}
+.td-prog{min-width:130px;}
+.td-updated{font-size:10px;color:var(--text-3);white-space:nowrap;}
+.prog-bar-bg{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:3px;}
+.prog-bar-fill{height:100%;border-radius:2px;transition:width .4s;}
+.prog-bar-fill.green{background:var(--green);}.prog-bar-fill.amber{background:var(--amber);}.prog-bar-fill.blue{background:var(--blue);}
+.prog-text{font-size:10px;color:var(--text-3);text-align:right;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.badge.eval{background:var(--amber-bg);color:var(--amber);}
+.badge.funded{background:var(--green-bg);color:var(--green);}
+.badge.withdraw{background:var(--blue-bg);color:var(--blue);}
+
+/* Bulk balance panel */
+.bulk-panel{background:var(--surface-1);border:1px solid var(--border-hi);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;display:none;}
+.bulk-panel.open{display:block;}
+.bulk-panel h2{font-size:14px;font-weight:500;margin-bottom:6px;}
+.bulk-panel p{font-size:12px;color:var(--text-3);margin-bottom:16px;}
+.bulk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;margin-bottom:16px;}
+.bulk-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.bc-info{flex:1;min-width:0;}
+.bc-firm{font-size:10px;color:var(--text-3);}
+.bc-id{font-size:11px;font-family:var(--mono);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc-cur{font-size:10px;color:var(--text-3);margin-top:2px;}
+.bulk-card input{width:115px;background:var(--bg);border:1px solid var(--border-hi);border-radius:6px;color:var(--text-1);font-size:13px;font-family:var(--mono);padding:6px 8px;outline:none;text-align:right;transition:border-color .12s;}
+.bulk-card input:focus{border-color:var(--blue);}
+.bulk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+/* Buttons */
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;padding:9px 20px;cursor:pointer;font-family:var(--sans);transition:opacity .12s;white-space:nowrap;}
+.btn-primary:hover{opacity:.88;}
+.btn-secondary{background:transparent;color:var(--text-1);border:1px solid var(--border-hi);border-radius:var(--radius);font-size:13px;padding:8px 16px;cursor:pointer;font-family:var(--sans);transition:all .12s;white-space:nowrap;}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue);}
+.btn-secondary.open{border-color:var(--amber);color:var(--amber);background:var(--amber-bg);}
+.feedback{font-size:12px;}
+.feedback.ok{color:var(--green);}.feedback.err{color:var(--red);}
+
+/* Target row */
+.target-row{display:flex;align-items:center;gap:12px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:16px;flex-wrap:wrap;}
+.target-row label{font-size:13px;color:var(--text-2);white-space:nowrap;}
+.target-row input{width:90px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:14px;font-family:var(--mono);padding:6px 10px;outline:none;transition:border-color .12s;}
+.target-row input:focus{border-color:var(--blue);}
+.hint{font-size:12px;color:var(--text-3);}
+
+/* Withdrawals */
+.withdraw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.w-card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;}
+.w-card.ready{border-color:var(--green);background:var(--green-bg);}
+.wc-firm{font-size:11px;color:var(--text-3);}
+.wc-id{font-size:11px;font-family:var(--mono);color:var(--text-2);margin-bottom:10px;word-break:break-all;}
+.wc-row{display:flex;justify-content:space-between;margin-bottom:5px;gap:8px;}
+.wc-lbl{font-size:12px;color:var(--text-3);}
+.wc-val{font-size:12px;font-family:var(--mono);font-weight:500;}
+.wc-footer{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.w-card.ready .wc-footer{border-color:var(--green-dim);}
+.wc-status{font-size:11px;color:var(--text-3);margin-top:4px;text-align:right;}
+.w-card.ready .wc-status{color:var(--green);font-weight:500;}
+
+/* Logger */
+.logger-box{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;}
+.logger-box h2{font-size:14px;font-weight:500;margin-bottom:16px;}
+.log-date-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;}
+.fg input[type=date],.fg input[type=text]{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:13px;padding:7px 10px;font-family:var(--sans);outline:none;}
+.fg input[type=date]:focus,.fg input[type=text]:focus{border-color:var(--blue);}
+.note-fg{flex:1;min-width:200px;}
+.note-fg input{width:100%;}
+.fill-all-row{display:flex;align-items:flex-end;gap:12px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--radius);margin-bottom:16px;flex-wrap:wrap;}
+.fa-group{display:flex;flex-direction:column;gap:5px;}
+.fa-group label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;}
+.fa-group input,.fa-group select{background:var(--bg);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:13px;padding:7px 10px;font-family:var(--sans);outline:none;}
+.fa-group input{width:110px;font-family:var(--mono);}
+.fa-group input:focus,.fa-group select:focus{border-color:var(--blue);}
+.btn-fill-all{background:var(--surface-1);border:1px solid var(--border-hi);color:var(--text-1);border-radius:var(--radius);font-size:12px;font-weight:500;padding:8px 14px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .12s;}
+.btn-fill-all:hover{border-color:var(--blue);color:var(--blue);}
+.fill-hint{font-size:11px;color:var(--text-3);}
+.per-account-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:16px;}
+.pa-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.pa-info{flex:1;min-width:0;}
+.pa-firm{font-size:10px;color:var(--text-3);}
+.pa-id{font-size:11px;font-family:var(--mono);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pa-card input{width:95px;background:var(--bg);border:1px solid var(--border-hi);border-radius:6px;color:var(--text-1);font-size:13px;font-family:var(--mono);padding:6px 8px;outline:none;text-align:right;transition:border-color .12s;}
+.pa-card input:focus{border-color:var(--blue);}
+.pa-card input.pos{color:var(--green);}.pa-card input.neg{color:var(--red);}
+.logger-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+
+/* History */
+.streak-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 12px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:500;border:1px solid var(--green-dim);}
+.history-day{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden;}
+.history-day-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none;gap:12px;flex-wrap:wrap;}
+.history-day-header:hover{background:var(--surface-2);}
+.hd-date{font-size:13px;font-weight:500;white-space:nowrap;}
+.hd-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.hd-total{font-family:var(--mono);font-size:13px;font-weight:500;}
+.hd-total.pos{color:var(--green);}.hd-total.neg{color:var(--red);}
+.hd-note{font-size:12px;color:var(--text-3);}
+.hd-del{background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:13px;padding:2px 6px;border-radius:4px;}
+.hd-del:hover{color:var(--red);background:var(--red-bg);}
+.hd-toggle{font-size:11px;color:var(--text-3);}
+.history-day-body{padding:0 14px 12px;border-top:1px solid var(--border);}
+.hat{width:100%;border-collapse:collapse;margin-top:10px;}
+.hat th{font-size:10px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.hat th.right{text-align:right;}
+.hat td{font-size:12px;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-2);}
+.hat tr:last-child td{border-bottom:none;}
+.hat td.mono{font-family:var(--mono);font-size:11px;}
+.hat td.pos{color:var(--green);font-family:var(--mono);text-align:right;}
+.hat td.neg{color:var(--red);font-family:var(--mono);text-align:right;}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.stat-card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
+.stat-card h3{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;}
+.stat-row:last-child{border-bottom:none;}
+.s-label{font-size:13px;color:var(--text-2);}
+.s-val{font-size:13px;font-family:var(--mono);font-weight:500;}
+.s-val.green{color:var(--green);}.s-val.red{color:var(--red);}.s-val.amber{color:var(--amber);}
+.empty{text-align:center;padding:40px;color:var(--text-3);font-size:13px;border:1px dashed var(--border);border-radius:var(--radius-lg);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:3px;}
+@media(max-width:768px){
+  .sidebar{width:60px;min-width:60px;}
+  .sidebar-logo,.nav-label,.nav-item span:not(.nav-icon),.nav-badge,.sidebar-footer{display:none;}
+  .main{margin-left:60px;padding:16px;}
+  .nav-item{justify-content:center;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-main">MES Dashboard</div>
+    <div class="logo-sub">Failed Breakdown · Copy</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" data-page="accounts"><span class="nav-icon">⊞</span><span>Accounts</span><span class="nav-badge" id="nav-badge-w">0</span></button>
+    <button class="nav-item" data-page="withdrawals"><span class="nav-icon">↑</span><span>Withdrawals</span></button>
+    <button class="nav-item" data-page="logger"><span class="nav-icon">✎</span><span>Daily P&amp;L log</span></button>
+    <button class="nav-item" data-page="stats"><span class="nav-icon">◈</span><span>Stats</span></button>
+  </div>
+  <div class="sidebar-footer">20 accounts · 5 firms<br>MESU6 · MES</div>
+</nav>
+
+<main class="main">
+
+  <!-- ACCOUNTS -->
+  <div class="page active" id="page-accounts">
+    <div class="page-header">
+      <h1>Accounts overview</h1>
+      <p>All 20 accounts across TakeProfit, Blusky, Lucid, MFFU, Tradeify</p>
+    </div>
+    <div class="kpi-strip" id="kpi-strip"></div>
+    <div class="target-row">
+      <label>Daily target / account</label>
+      <input type="number" id="daily-target" value="100" min="1" step="1"/>
+      <span class="hint" id="daily-hint"></span>
+      <button class="btn-secondary" id="toggle-bulk-btn" style="margin-left:auto;">⟳ Update balances</button>
+      <span class="feedback" id="bulk-feedback"></span>
+    </div>
+    <div class="bulk-panel" id="bulk-panel">
+      <h2>Update account balances</h2>
+      <p>Paste the current balance for each account from your copy trader. Leave blank to keep the existing value.</p>
+      <div class="bulk-grid" id="bulk-grid"></div>
+      <div class="bulk-actions">
+        <button class="btn-primary" id="save-bulk-btn">Save balances</button>
+        <button class="btn-secondary" id="cancel-bulk-btn">Cancel</button>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">All accounts</div>
+        <div class="chips">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="eval">Eval</button>
+          <button class="chip" data-filter="funded">Funded</button>
+        </div>
+      </div>
+      <div class="accounts-wrap">
+        <table class="accounts-table">
+          <thead><tr>
+            <th>Firm</th><th>Account</th>
+            <th class="right">Balance</th>
+            <th class="right">Logged P&amp;L</th>
+            <th class="right">Drift</th>
+            <th>Phase</th><th>Progress</th><th>Updated</th>
+          </tr></thead>
+          <tbody id="accounts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WITHDRAWALS -->
+  <div class="page" id="page-withdrawals">
+    <div class="page-header">
+      <h1>Withdrawal tracker</h1>
+      <p>$1,000 per account · $200 fat above floor after each withdrawal</p>
+    </div>
+    <div class="kpi-strip" id="w-kpi-strip"></div>
+    <div class="section">
+      <div class="section-title" style="margin-bottom:12px;">Funded accounts</div>
+      <div class="withdraw-grid" id="withdraw-grid"></div>
+    </div>
+  </div>
+
+  <!-- LOGGER -->
+  <div class="page" id="page-logger">
+    <div class="page-header">
+      <h1>Daily P&amp;L log</h1>
+      <p>Log each account individually · data saved in your browser</p>
+    </div>
+    <div class="logger-box">
+      <h2>Log a session</h2>
+      <div class="log-date-row">
+        <div class="fg"><label for="log-date">Date</label><input type="date" id="log-date"/></div>
+        <div class="fg note-fg"><label for="log-session-note">Session note (optional)</label><input type="text" id="log-session-note" placeholder="e.g. clean failed breakdown at S1"/></div>
+      </div>
+      <div class="fill-all-row">
+        <div class="fa-group"><label>Fill all accounts ($)</label><input type="number" id="fill-all-val" placeholder="e.g. 100" step="0.25"/></div>
+        <div class="fa-group"><label>Contracts</label>
+          <select id="fill-all-contracts">
+            <option value="1">1 MES</option><option value="2">2 MES</option>
+            <option value="3">3 MES</option><option value="4">4 MES</option><option value="5">5 MES</option>
+          </select>
+        </div>
+        <button class="btn-fill-all" id="fill-all-btn">→ Apply to all accounts</button>
+        <span class="fill-hint">Then adjust individual accounts as needed</span>
+      </div>
+      <div class="per-account-grid" id="per-account-grid"></div>
+      <div class="logger-actions">
+        <button class="btn-primary" id="add-log-btn">Save session</button>
+        <span class="feedback" id="log-feedback"></span>
+      </div>
+    </div>
+    <div class="section-header" style="margin-bottom:12px;">
+      <div class="section-title">Session history</div>
+      <div id="streak-display"></div>
+    </div>
+    <div id="history-area"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="page" id="page-stats">
+    <div class="page-header"><h1>Performance stats</h1><p>Calculated from your logged sessions</p></div>
+    <div class="stats-grid" id="stats-grid"></div>
+  </div>
+
+</main>
+</div>
+
+<script>
+const ACCOUNTS = [
+  {firm:'TakeProfit', id:'TAKEPROFIT319314202',    start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+  {firm:'TakeProfit', id:'TAKEPROFITPRO185572638', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
+  {firm:'TakeProfit', id:'TAKEPROFITPRO263657073', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
+  {firm:'TakeProfit', id:'TAKEPROFITPRO263342466', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
+  {firm:'TakeProfit', id:'TAKEPROFITPRO574944938', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
+  {firm:'Blusky',     id:'BSKEPROPELJOHN72668',    start:150000, phase:'funded', evalTarget:null,   withdrawal:{trigger:153200, after:152200, floor:152000}},
+  {firm:'Blusky',     id:'BSKEPROPELJOHN01453',    start:150000, phase:'eval',   evalTarget:153000, withdrawal:null},
+  {firm:'Blusky',     id:'BSKEPROPELJOHN14974',    start:150000, phase:'funded', evalTarget:null,   withdrawal:{trigger:153200, after:152200, floor:152000}},
+  {firm:'Lucid',      id:'LFF02556352960006',      start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27450,  after:26450,  floor:26250}},
+  {firm:'Lucid',      id:'LFF02556352960007',      start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27450,  after:26450,  floor:26250}},
+  {firm:'Lucid',      id:'LFF02556352960008',      start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27450,  after:26450,  floor:26250}},
+  {firm:'Lucid',      id:'LFF02556352960009',      start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27450,  after:26450,  floor:26250}},
+  {firm:'Lucid',      id:'LFF02556352960010',      start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27450,  after:26450,  floor:26250}},
+  {firm:'MFFU',       id:'MFFUSFRPD131340051',     start:0,      phase:'funded', evalTarget:null,   withdrawal:{trigger:2700,   after:1700,   floor:1500},  mffu:true},
+  {firm:'MFFU',       id:'MFFUSFRPD131340052',     start:0,      phase:'funded', evalTarget:null,   withdrawal:{trigger:2700,   after:1700,   floor:1500},  mffu:true},
+  {firm:'Tradeify',   id:'TDFYG25191782574',       start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+  {firm:'Tradeify',   id:'TDFYG25722843841',       start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+  {firm:'Tradeify',   id:'TDFYG25726573111',       start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+  {firm:'Tradeify',   id:'TDFYG25635275055',       start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+  {firm:'Tradeify',   id:'TDFYG25255462687',       start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
+];
+
+const DEFAULT_BALANCES = {
+  'TAKEPROFIT319314202':25510,'TAKEPROFITPRO185572638':25242.75,'TAKEPROFITPRO263657073':25105.25,
+  'TAKEPROFITPRO263342466':25106.50,'TAKEPROFITPRO574944938':25105.25,
+  'BSKEPROPELJOHN72668':150931.85,'BSKEPROPELJOHN01453':152270.70,'BSKEPROPELJOHN14974':150936.85,
+  'LFF02556352960006':25346.75,'LFF02556352960007':25349.00,'LFF02556352960008':25351.50,
+  'LFF02556352960009':25351.50,'LFF02556352960010':25352.75,
+  'MFFUSFRPD131340051':514.25,'MFFUSFRPD131340052':519.25,
+  'TDFYG25191782574':25831.75,'TDFYG25722843841':25823.00,'TDFYG25726573111':25828.00,
+  'TDFYG25635275055':25826.10,'TDFYG25255462687':25823.00
+};
+
+function loadLog()      {try{return JSON.parse(localStorage.getItem('mes_pnl_log_v2')||'[]');}catch{return[];}}
+function loadBal()      {try{return JSON.parse(localStorage.getItem('mes_balances_v1')||'{}');}catch{return{};}}
+function saveLog(d)     {localStorage.setItem('mes_pnl_log_v2',JSON.stringify(d));}
+function saveBal(d)     {localStorage.setItem('mes_balances_v1',JSON.stringify(d));}
+
+let pnlLog=loadLog(), balStore=loadBal(), activeFilter='all';
+
+const fmt  = n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtS = n=>(n>=0?'+':'')+fmt(n);
+const getDT= ()=>parseFloat(document.getElementById('daily-target').value)||100;
+const getBal= a=>balStore[a.id]?balStore[a.id].balance:DEFAULT_BALANCES[a.id];
+const getTs = a=>balStore[a.id]?balStore[a.id].ts:null;
+const getPnl= a=>a.mffu?getBal(a):(getBal(a)-a.start);
+
+function getLoggedPnl(a){
+  return pnlLog.reduce((s,sess)=>{
+    const e=(sess.entries||[]).find(e=>e.accountId===a.id);
+    return s+(e?e.pnl:0);
+  },0);
+}
+
+function getProgress(a){
+  const dt=getDT(), bal=getBal(a);
+  if(a.phase==='eval'){
+    const rem=Math.max(0,a.evalTarget-bal);
+    const pct=Math.min(100,((bal-a.start)/(a.evalTarget-a.start))*100);
+    return{pct,rem,color:'amber',days:rem>0?Math.ceil(rem/dt):0,ready:false};
+  }
+  if(a.withdrawal){
+    const base=a.mffu?0:a.start;
+    const rem=Math.max(0,a.withdrawal.trigger-bal);
+    const pct=Math.min(100,((bal-base)/(a.withdrawal.trigger-base))*100);
+    const ready=bal>=a.withdrawal.trigger;
+    return{pct,rem,color:ready?'green':'blue',days:rem>0?Math.ceil(rem/dt):0,ready};
+  }
+  return{pct:0,rem:0,color:'green',days:0,ready:false};
+}
+
+function fmtTs(ts){
+  if(!ts)return'original';
+  const d=new Date(ts);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderKPIs(){
+  const totalPnl=ACCOUNTS.reduce((s,a)=>s+getPnl(a),0);
+  const evalC=ACCOUNTS.filter(a=>a.phase==='eval').length;
+  const fundC=ACCOUNTS.filter(a=>a.phase==='funded').length;
+  const readyC=ACCOUNTS.filter(a=>a.withdrawal&&getBal(a)>=a.withdrawal.trigger).length;
+  const dt=getDT();
+  document.getElementById('nav-badge-w').textContent=readyC;
+  document.getElementById('kpi-strip').innerHTML=`
+    <div class="kpi-card"><div class="k-label">Total P&amp;L</div><div class="k-value ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl)}</div><div class="k-sub">all accounts combined</div></div>
+    <div class="kpi-card"><div class="k-label">Accounts</div><div class="k-value">${ACCOUNTS.length}</div><div class="k-sub">across 5 firms</div></div>
+    <div class="kpi-card"><div class="k-label">In eval</div><div class="k-value amber">${evalC}</div><div class="k-sub">working toward pass</div></div>
+    <div class="kpi-card"><div class="k-label">Funded</div><div class="k-value green">${fundC}</div><div class="k-sub">drawdown locked</div></div>
+    <div class="kpi-card"><div class="k-label">Ready to withdraw</div><div class="k-value ${readyC>0?'green':'blue'}">${readyC}</div><div class="k-sub">at trigger balance</div></div>
+    <div class="kpi-card"><div class="k-label">Daily target</div><div class="k-value blue">${fmt(dt*ACCOUNTS.length)}</div><div class="k-sub">${fmt(dt)} × ${ACCOUNTS.length} accounts</div></div>`;
+  const fW=ACCOUNTS.filter(a=>a.withdrawal);
+  const needed=fW.reduce((s,a)=>s+Math.max(0,a.withdrawal.trigger-getBal(a)),0);
+  document.getElementById('w-kpi-strip').innerHTML=`
+    <div class="kpi-card"><div class="k-label">Funded accounts</div><div class="k-value">${fW.length}</div><div class="k-sub">with withdrawal target</div></div>
+    <div class="kpi-card"><div class="k-label">Ready now</div><div class="k-value ${readyC>0?'green':'amber'}">${readyC}</div><div class="k-sub">at trigger</div></div>
+    <div class="kpi-card"><div class="k-label">Potential payout</div><div class="k-value green">${fmt(readyC*1000)}</div><div class="k-sub">$1,000 × ${readyC} accounts</div></div>
+    <div class="kpi-card"><div class="k-label">Total still needed</div><div class="k-value amber">${fmt(needed)}</div><div class="k-sub">to hit all triggers</div></div>`;
+}
+
+function renderAccounts(){
+  const list=activeFilter==='all'?ACCOUNTS:ACCOUNTS.filter(a=>a.phase===activeFilter);
+  document.getElementById('accounts-tbody').innerHTML=list.map(a=>{
+    const bal=getBal(a), pnl=getPnl(a), logged=getLoggedPnl(a);
+    const calcBal=a.start+logged;
+    const drift=bal-calcBal;
+    const prog=getProgress(a);
+    const badge=a.phase==='eval'?`<span class="badge eval">Eval</span>`:prog.ready?`<span class="badge withdraw">↑ Withdraw</span>`:`<span class="badge funded">Funded</span>`;
+    const driftCls=Math.abs(drift)<0.01?'zero':drift>0?'pos':'neg';
+    const driftStr=Math.abs(drift)<0.01?'—':fmtS(drift);
+    return`<tr>
+      <td class="td-firm">${a.firm}</td>
+      <td class="td-id">${a.id}</td>
+      <td class="td-balance">${fmt(bal)}</td>
+      <td class="td-logged ${logged>=0?'pos':'neg'}">${fmtS(logged)}</td>
+      <td class="td-drift ${driftCls}" title="Real balance minus calculated (start + logged P&L)">${driftStr}</td>
+      <td>${badge}</td>
+      <td class="td-prog">
+        <div class="prog-bar-bg"><div class="prog-bar-fill ${prog.color}" style="width:${prog.pct.toFixed(1)}%"></div></div>
+        <div class="prog-text">${prog.pct>=100?'✓ done':prog.pct.toFixed(0)+'%'}${prog.days>0?' · ~'+prog.days+'d':''}</div>
+      </td>
+      <td class="td-updated">${fmtTs(getTs(a))}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderBulkGrid(){
+  document.getElementById('bulk-grid').innerHTML=ACCOUNTS.map(a=>`
+    <div class="bulk-card">
+      <div class="bc-info">
+        <div class="bc-firm">${a.firm}</div>
+        <div class="bc-id" title="${a.id}">${a.id}</div>
+        <div class="bc-cur">Current: ${fmt(getBal(a))}</div>
+      </div>
+      <input type="number" step="0.01" placeholder="${getBal(a).toFixed(2)}" id="bulk-${a.id}"/>
+    </div>`).join('');
+}
+
+document.getElementById('toggle-bulk-btn').addEventListener('click',()=>{
+  const panel=document.getElementById('bulk-panel');
+  const btn=document.getElementById('toggle-bulk-btn');
+  const open=panel.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.textContent=open?'✕ Cancel update':'⟳ Update balances';
+  if(open) renderBulkGrid();
+});
+document.getElementById('cancel-bulk-btn').addEventListener('click',()=>{
+  document.getElementById('bulk-panel').classList.remove('open');
+  const btn=document.getElementById('toggle-bulk-btn');
+  btn.classList.remove('open');
+  btn.textContent='⟳ Update balances';
+});
+document.getElementById('save-bulk-btn').addEventListener('click',()=>{
+  let updated=0;
+  const now=new Date().toISOString();
+  ACCOUNTS.forEach(a=>{
+    const inp=document.getElementById('bulk-'+a.id);
+    if(!inp) return;
+    const val=parseFloat(inp.value);
+    if(!isNaN(val)&&val>0){balStore[a.id]={balance:val,ts:now};updated++;}
+  });
+  saveBal(balStore);
+  const fb=document.getElementById('bulk-feedback');
+  fb.textContent=`${updated} balance${updated!==1?'s':''} updated ✓`;
+  fb.className='feedback ok';
+  setTimeout(()=>fb.textContent='',4000);
+  document.getElementById('bulk-panel').classList.remove('open');
+  const btn=document.getElementById('toggle-bulk-btn');
+  btn.classList.remove('open');
+  btn.textContent='⟳ Update balances';
+  renderAll();
+});
+
+function renderWithdrawals(){
+  const dt=getDT();
+  document.getElementById('withdraw-grid').innerHTML=ACCOUNTS.filter(a=>a.withdrawal).map(a=>{
+    const w=a.withdrawal, bal=getBal(a);
+    const rem=Math.max(0,w.trigger-bal);
+    const ready=bal>=w.trigger;
+    const days=rem>0?Math.ceil(rem/dt):0;
+    const base=a.mffu?0:a.start;
+    const pct=Math.min(100,((bal-base)/(w.trigger-base))*100);
+    return`<div class="w-card ${ready?'ready':''}">
+      <div class="wc-firm">${a.firm}</div>
+      <div class="wc-id">${a.id}</div>
+      <div class="wc-row"><span class="wc-lbl">Balance</span><span class="wc-val">${fmt(bal)}</span></div>
+      <div class="wc-row"><span class="wc-lbl">Trigger</span><span class="wc-val">${fmt(w.trigger)}</span></div>
+      <div class="wc-row"><span class="wc-lbl">After withdrawal</span><span class="wc-val">${fmt(w.after)}</span></div>
+      <div class="wc-row"><span class="wc-lbl">Floor + $200 fat</span><span class="wc-val">${fmt(w.floor)}</span></div>
+      <div class="wc-footer">
+        <div class="prog-bar-bg" style="margin-bottom:4px"><div class="prog-bar-fill ${ready?'green':'blue'}" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="wc-status">${ready?'✓ Ready — withdraw $1,000':fmt(rem)+' remaining'+(days?' · ~'+days+'d':'')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPerAccountGrid(){
+  document.getElementById('per-account-grid').innerHTML=ACCOUNTS.map(a=>`
+    <div class="pa-card">
+      <div class="pa-info"><div class="pa-firm">${a.firm}</div><div class="pa-id" title="${a.id}">${a.id}</div></div>
+      <input type="number" step="0.25" placeholder="0.00" id="pa-${a.id}" oninput="colorPa(this)"/>
+    </div>`).join('');
+}
+window.colorPa=function(el){const v=parseFloat(el.value);el.classList.toggle('pos',!isNaN(v)&&v>0);el.classList.toggle('neg',!isNaN(v)&&v<0);};
+
+document.getElementById('fill-all-btn').addEventListener('click',()=>{
+  const val=document.getElementById('fill-all-val').value;
+  if(!val) return;
+  ACCOUNTS.forEach(a=>{const inp=document.getElementById('pa-'+a.id);if(inp){inp.value=val;window.colorPa(inp);}});
+  window._sc=parseInt(document.getElementById('fill-all-contracts').value);
+});
+
+document.getElementById('add-log-btn').addEventListener('click',()=>{
+  const date=document.getElementById('log-date').value;
+  const note=document.getElementById('log-session-note').value.trim();
+  const fb=document.getElementById('log-feedback');
+  if(!date){fb.textContent='Please select a date.';fb.className='feedback err';return;}
+  const entries=ACCOUNTS.map(a=>{const inp=document.getElementById('pa-'+a.id);const v=inp?parseFloat(inp.value):NaN;return{accountId:a.id,firm:a.firm,pnl:isNaN(v)?0:v};});
+  if(!entries.some(e=>e.pnl!==0)){fb.textContent='Enter at least one P&L value.';fb.className='feedback err';return;}
+  const totalPnl=entries.reduce((s,e)=>s+e.pnl,0);
+  pnlLog.push({id:Date.now().toString(),date,note,contracts:window._sc||1,entries,totalPnl});
+  saveLog(pnlLog);
+  ACCOUNTS.forEach(a=>{const inp=document.getElementById('pa-'+a.id);if(inp){inp.value='';inp.classList.remove('pos','neg');}});
+  document.getElementById('log-session-note').value='';
+  document.getElementById('fill-all-val').value='';
+  fb.textContent=`Session saved ✓ — total ${fmtS(totalPnl)} across all accounts`;
+  fb.className='feedback ok';
+  setTimeout(()=>fb.textContent='',4000);
+  renderHistory();renderStats();
+});
+
+function getStreak(){
+  if(!pnlLog.length) return 0;
+  const dates=[...new Set(pnlLog.map(l=>l.date))].sort((a,b)=>b.localeCompare(a));
+  let s=0;
+  for(const d of dates){const p=pnlLog.filter(l=>l.date===d).reduce((x,l)=>x+l.totalPnl,0);if(p>=0)s++;else break;}
+  return s;
+}
+window.toggleDay=function(id){
+  const b=document.getElementById('hdbody-'+id),i=document.getElementById('hdicon-'+id);
+  if(!b||!i) return;
+  const open=b.style.display!=='none';
+  b.style.display=open?'none':'block';i.textContent=open?'▸':'▾';
+};
+window.deleteSession=function(id){
+  if(!confirm('Delete this session?')) return;
+  pnlLog=pnlLog.filter(l=>l.id!==id);saveLog(pnlLog);renderHistory();renderStats();
+};
+
+function renderHistory(){
+  const streak=getStreak();
+  document.getElementById('streak-display').innerHTML=streak>0?`<span class="streak-pill">🔥 ${streak}-day green streak</span>`:'';
+  if(!pnlLog.length){document.getElementById('history-area').innerHTML=`<div class="empty">No sessions logged yet.</div>`;return;}
+  const sorted=[...pnlLog].sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('history-area').innerHTML=sorted.map(sess=>{
+    const dl=new Date(sess.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const rows=(sess.entries||[]).filter(e=>e.pnl!==0).map(e=>`<tr><td>${e.firm}</td><td class="mono">${e.accountId}</td><td class="${e.pnl>=0?'pos':'neg'}">${fmtS(e.pnl)}</td></tr>`).join('');
+    return`<div class="history-day">
+      <div class="history-day-header" onclick="toggleDay('${sess.id}')">
+        <span class="hd-date">${dl}</span>
+        <span class="hd-meta">
+          ${sess.note?`<span class="hd-note">${sess.note}</span>`:''}
+          <span class="hd-total ${sess.totalPnl>=0?'pos':'neg'}">${fmtS(sess.totalPnl)} total</span>
+          <span class="hd-total" style="font-size:11px;opacity:.7;color:var(--text-3)">(avg ${fmtS(sess.totalPnl/ACCOUNTS.length)}/acct)</span>
+          <button class="hd-del" onclick="event.stopPropagation();deleteSession('${sess.id}')">✕</button>
+          <span class="hd-toggle" id="hdicon-${sess.id}">▸</span>
+        </span>
+      </div>
+      <div class="history-day-body" id="hdbody-${sess.id}" style="display:none">
+        <table class="hat"><thead><tr><th>Firm</th><th>Account</th><th class="right">P&amp;L</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderStats(){
+  if(!pnlLog.length){document.getElementById('stats-grid').innerHTML=`<div class="empty" style="grid-column:1/-1">No sessions logged yet.</div>`;return;}
+  const totals=pnlLog.map(l=>l.totalPnl);
+  const total=totals.reduce((s,v)=>s+v,0);
+  const avgTotal=total/pnlLog.length;
+  const avgPerAcct=avgTotal/ACCOUNTS.length;
+  const greenDays=pnlLog.filter(l=>l.totalPnl>0).length;
+  const redDays=pnlLog.filter(l=>l.totalPnl<0).length;
+  const best=Math.max(...totals), worst=Math.min(...totals);
+  const winRate=((greenDays/pnlLog.length)*100).toFixed(1);
+  const streak=getStreak(), dt=getDT();
+  const daysToGoal=avgPerAcct>0?Math.ceil(dt/avgPerAcct):'—';
+  const at={};
+  pnlLog.forEach(s=>(s.entries||[]).forEach(e=>{at[e.accountId]=(at[e.accountId]||0)+e.pnl;}));
+  const bestId=Object.keys(at).sort((a,b)=>at[b]-at[a])[0];
+  const bestA=ACCOUNTS.find(a=>a.id===bestId);
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card"><h3>Session summary</h3>
+      <div class="stat-row"><span class="s-label">Sessions logged</span><span class="s-val">${pnlLog.length}</span></div>
+      <div class="stat-row"><span class="s-label">Green days</span><span class="s-val green">${greenDays}</span></div>
+      <div class="stat-row"><span class="s-label">Red days</span><span class="s-val red">${redDays}</span></div>
+      <div class="stat-row"><span class="s-label">Win rate</span><span class="s-val ${parseFloat(winRate)>=50?'green':'red'}">${winRate}%</span></div>
+      <div class="stat-row"><span class="s-label">Current streak</span><span class="s-val green">${streak>0?streak+' days 🔥':'—'}</span></div>
+    </div>
+    <div class="stat-card"><h3>P&amp;L per account (avg)</h3>
+      <div class="stat-row"><span class="s-label">Average / session</span><span class="s-val ${avgPerAcct>=0?'green':'red'}">${fmtS(avgPerAcct)}</span></div>
+      <div class="stat-row"><span class="s-label">Days to $${dt} target</span><span class="s-val amber">${daysToGoal}</span></div>
+      <div class="stat-row"><span class="s-label">Best session</span><span class="s-val green">${fmtS(best/ACCOUNTS.length)}</span></div>
+      <div class="stat-row"><span class="s-label">Worst session</span><span class="s-val red">${fmtS(worst/ACCOUNTS.length)}</span></div>
+    </div>
+    <div class="stat-card"><h3>Total across all accounts</h3>
+      <div class="stat-row"><span class="s-label">Cumulative P&amp;L</span><span class="s-val ${total>=0?'green':'red'}">${fmtS(total)}</span></div>
+      <div class="stat-row"><span class="s-label">Average / session</span><span class="s-val">${fmtS(avgTotal)}</span></div>
+      <div class="stat-row"><span class="s-label">Best session</span><span class="s-val green">${fmtS(best)}</span></div>
+      <div class="stat-row"><span class="s-label">Worst session</span><span class="s-val red">${fmtS(worst)}</span></div>
+    </div>
+    <div class="stat-card"><h3>Top performing account</h3>
+      <div class="stat-row"><span class="s-label">Firm</span><span class="s-val">${bestA?bestA.firm:'—'}</span></div>
+      <div class="stat-row"><span class="s-label">Account</span><span class="s-val" style="font-size:11px">${bestId||'—'}</span></div>
+      <div class="stat-row"><span class="s-label">Cumulative P&amp;L</span><span class="s-val green">${bestId?fmtS(at[bestId]):'—'}</span></div>
+    </div>`;
+}
+
+document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.page).classList.add('active');
+    renderAll();
+  });
+});
+document.querySelectorAll('.chip[data-filter]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    activeFilter=btn.dataset.filter;
+    document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAccounts();
+  });
+});
+document.getElementById('daily-target').addEventListener('input',renderAll);
+
+function renderAll(){
+  renderKPIs();renderAccounts();renderWithdrawals();renderHistory();renderStats();
+  const dt=getDT();
+  document.getElementById('daily-hint').textContent=`= ${fmt(dt*ACCOUNTS.length)} total across ${ACCOUNTS.length} accounts`;
+}
+
+document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
+renderPerAccountGrid();
+renderAll();
+</script>
+</body>
+</html>
