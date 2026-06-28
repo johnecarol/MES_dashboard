@@ -210,6 +210,86 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
 .s-val.green{color:var(--green);}.s-val.red{color:var(--red);}.s-val.amber{color:var(--amber);}
 
 .empty{text-align:center;padding:40px;color:var(--text-3);font-size:13px;border:1px dashed var(--border);border-radius:var(--radius-lg);}
+
+/* ── Calendar ── */
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+.cal-nav{display:flex;align-items:center;gap:8px;}
+.cal-nav-btn{background:var(--surface-1);border:1px solid var(--border-hi);color:var(--text-1);border-radius:var(--radius);font-size:20px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;line-height:1;}
+.cal-nav-btn:hover{border-color:var(--blue);color:var(--blue);}
+.cal-month-label{font-size:16px;font-weight:600;color:var(--text-1);min-width:160px;text-align:center;letter-spacing:-0.3px;}
+.cal-today-btn{background:transparent;border:1px solid var(--border-hi);color:var(--text-2);border-radius:var(--radius);font-size:12px;padding:6px 12px;cursor:pointer;font-family:var(--sans);transition:all .12s;}
+.cal-today-btn:hover{border-color:var(--blue);color:var(--blue);}
+.cal-account-wrap{display:flex;align-items:center;gap:8px;}
+.cal-select-label{font-size:12px;color:var(--text-3);}
+.cal-select{background:var(--surface-1);border:1px solid var(--border-hi);color:var(--text-1);border-radius:var(--radius);font-size:13px;padding:7px 10px;font-family:var(--sans);outline:none;min-width:240px;cursor:pointer;}
+.cal-select:focus{border-color:var(--blue);}
+
+/* Summary strip */
+.cal-summary-strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.cal-sum-card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;flex:1;min-width:100px;}
+.cal-sum-card .cs-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.cal-sum-card .cs-val{font-size:18px;font-weight:500;font-family:var(--mono);}
+.cs-val.green{color:var(--green);}.cs-val.red{color:var(--red);}.cs-val.amber{color:var(--amber);}.cs-val.blue{color:var(--blue);}
+
+/* Calendar grid */
+.cal-grid-wrap{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.cal-dow-headers{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
+.cal-dow-headers div{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;text-align:center;padding:10px 0;font-weight:500;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-cell{min-height:90px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;cursor:pointer;transition:background .12s;position:relative;}
+.cal-cell:nth-child(7n){border-right:none;}
+.cal-cell:hover{background:var(--surface-2);}
+.cal-cell.other-month{opacity:.35;}
+.cal-cell.today .cal-day-num{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-cell.has-data{cursor:pointer;}
+.cal-cell.no-data{cursor:default;}
+.cal-day-num{font-size:12px;color:var(--text-3);font-weight:500;margin-bottom:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-cell-pnl{font-size:13px;font-weight:500;font-family:var(--mono);}
+.cal-cell-pnl.pos{color:var(--green);}.cal-cell-pnl.neg{color:var(--red);}
+.cal-cell-avg{font-size:11px;color:var(--text-3);margin-top:2px;font-family:var(--mono);}
+.cal-cell-avg.pos{color:rgba(61,214,140,.6);}.cal-cell-avg.neg{color:rgba(240,91,91,.6);}
+.cal-cell-dot{width:6px;height:6px;border-radius:50%;margin-top:4px;}
+.cal-cell-dot.green{background:var(--green);}.cal-cell-dot.red{background:var(--red);}
+/* milestone bar inside cell */
+.cal-cell-milestone{margin-top:5px;}
+.cal-cell-ms-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.cal-cell-ms-fill{height:100%;border-radius:2px;}
+.cal-cell-ms-fill.amber{background:var(--amber);}
+.cal-cell-ms-fill.blue{background:var(--blue);}
+.cal-cell-ms-fill.green{background:var(--green);}
+.cal-cell-ms-text{font-size:9px;color:var(--text-3);margin-top:2px;}
+
+/* Selected cell highlight */
+.cal-cell.selected{background:var(--blue-bg);border-color:var(--blue);}
+
+/* Detail panel */
+.cal-detail{background:var(--surface-1);border:1px solid var(--border-hi);border-radius:var(--radius-lg);padding:20px;margin-top:16px;}
+.cal-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-detail-date{font-size:15px;font-weight:600;color:var(--text-1);}
+.cal-detail-close{background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;}
+.cal-detail-close:hover{color:var(--red);background:var(--red-bg);}
+.cal-detail-body{}
+.cal-detail-table{width:100%;border-collapse:collapse;}
+.cal-detail-table th{font-size:10px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:5px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.cal-detail-table th.right{text-align:right;}
+.cal-detail-table td{font-size:13px;padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text-2);}
+.cal-detail-table tr:last-child td{border-bottom:none;}
+.cal-detail-table td.mono{font-family:var(--mono);}
+.cal-detail-table td.pos{color:var(--green);font-family:var(--mono);text-align:right;font-weight:500;}
+.cal-detail-table td.neg{color:var(--red);font-family:var(--mono);text-align:right;font-weight:500;}
+.cal-detail-table td.right{text-align:right;font-family:var(--mono);}
+.cal-detail-single{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.cal-ds-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.cal-ds-card .ds-label{font-size:11px;color:var(--text-3);margin-bottom:4px;}
+.cal-ds-card .ds-val{font-size:18px;font-weight:500;font-family:var(--mono);}
+.cal-ds-card .ds-val.green{color:var(--green);}.cal-ds-card .ds-val.red{color:var(--red);}.cal-ds-card .ds-val.blue{color:var(--blue);}.cal-ds-card .ds-val.amber{color:var(--amber);}
+.cal-ms-detail{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.cal-ms-detail h4{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.cal-ms-bar-lg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.cal-ms-fill-lg{height:100%;border-radius:3px;}
+.cal-ms-fill-lg.amber{background:var(--amber);}.cal-ms-fill-lg.blue{background:var(--blue);}.cal-ms-fill-lg.green{background:var(--green);}
+.cal-ms-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);}
+
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:3px;}
@@ -235,6 +315,7 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
     <button class="nav-item" data-page="withdrawals"><span class="nav-icon">↑</span><span>Withdrawals</span></button>
     <button class="nav-item" data-page="logger"><span class="nav-icon">✎</span><span>Daily P&amp;L log</span></button>
     <button class="nav-item" data-page="stats"><span class="nav-icon">◈</span><span>Stats</span></button>
+    <button class="nav-item" data-page="calendar"><span class="nav-icon">▦</span><span>Calendar</span></button>
   </div>
   <div class="sidebar-footer">20 accounts · 5 firms<br>MESU6 · MES</div>
 </nav>
@@ -356,6 +437,45 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
   <div class="page" id="page-stats">
     <div class="page-header"><h1>Performance stats</h1><p>Calculated from your logged sessions</p></div>
     <div class="stats-grid" id="stats-grid"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="page" id="page-calendar">
+    <div class="page-header">
+      <h1>P&amp;L Calendar</h1>
+      <p>Daily results at a glance — all accounts or drill into one</p>
+    </div>
+    <div class="cal-toolbar">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+        <button class="cal-today-btn" id="cal-today">Today</button>
+      </div>
+      <div class="cal-account-wrap">
+        <label class="cal-select-label">View</label>
+        <select id="cal-account-select" class="cal-select">
+          <option value="all">All accounts (total + avg)</option>
+        </select>
+      </div>
+    </div>
+    <!-- Summary strip below toolbar -->
+    <div class="cal-summary-strip" id="cal-summary-strip"></div>
+    <!-- Calendar grid -->
+    <div class="cal-grid-wrap">
+      <div class="cal-dow-headers">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <!-- Day detail panel -->
+    <div class="cal-detail" id="cal-detail" style="display:none">
+      <div class="cal-detail-header">
+        <span class="cal-detail-date" id="cal-detail-date"></span>
+        <button class="cal-detail-close" id="cal-detail-close">✕</button>
+      </div>
+      <div class="cal-detail-body" id="cal-detail-body"></div>
+    </div>
   </div>
 
 </main>
@@ -814,7 +934,11 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('page-'+btn.dataset.page).classList.add('active');
-    renderAll();
+    if (btn.dataset.page === 'calendar') {
+      renderCalendar();
+    } else {
+      renderAll();
+    }
   });
 });
 document.querySelectorAll('.chip[data-filter]').forEach(btn => {
@@ -831,6 +955,314 @@ function renderAll() {
   renderKPIs(); renderAccounts(); renderWithdrawals(); renderHistory(); renderStats();
   const dt = getDT();
   document.getElementById('daily-hint').textContent = `= ${fmt(dt*ACCOUNTS.length)} total across ${ACCOUNTS.length} accounts`;
+}
+
+// ─── Calendar ────────────────────────────────────────────────────────────────
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+let calSelectedDate = null;
+let calSelectedAccount = 'all';
+
+function calPopulateSelect() {
+  const sel = document.getElementById('cal-account-select');
+  // Keep first option (all), rebuild the rest
+  while (sel.options.length > 1) sel.remove(1);
+  ACCOUNTS.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = a.firm + ' · ' + a.id;
+    sel.appendChild(opt);
+  });
+  sel.value = calSelectedAccount;
+}
+
+// Get all sessions for a given date string YYYY-MM-DD
+function calGetSessions(dateStr) {
+  return pnlLog.filter(l => l.date === dateStr);
+}
+
+// Get P&L for a specific account on a specific date
+function calGetAccountPnl(dateStr, accountId) {
+  const sessions = calGetSessions(dateStr);
+  return sessions.reduce((sum, sess) => {
+    const entry = (sess.entries || []).find(e => e.accountId === accountId);
+    return sum + (entry ? entry.pnl : 0);
+  }, 0);
+}
+
+// Get total + avg P&L across all accounts for a date
+function calGetAllPnl(dateStr) {
+  const sessions = calGetSessions(dateStr);
+  if (!sessions.length) return null;
+  const total = sessions.reduce((s, sess) => s + sess.totalPnl, 0);
+  return { total, avg: total / ACCOUNTS.length };
+}
+
+// Get balance + progress for an account on a specific date
+// Reconstruct by replaying all sessions up to and including dateStr
+function calGetAccountStateOnDate(accountId, dateStr) {
+  const a = ACCOUNTS.find(x => x.id === accountId);
+  if (!a) return null;
+
+  // Sum all logged P&L for this account up to and including dateStr
+  let runningPnl = 0;
+  pnlLog
+    .filter(sess => sess.date <= dateStr)
+    .forEach(sess => {
+      const entry = (sess.entries || []).find(e => e.accountId === accountId);
+      if (entry) runningPnl += entry.pnl;
+    });
+
+  const base    = DEFAULT_BALANCES[accountId];
+  const balance = Math.round((base + runningPnl) * 100) / 100;
+  const pnl     = a.mffu ? balance : (balance - a.start);
+
+  // Progress
+  let milestone = null, pct = 0, color = 'amber', rem = 0;
+  if (a.phase === 'eval') {
+    rem   = Math.max(0, a.evalTarget - balance);
+    pct   = Math.min(100, ((balance - a.start) / (a.evalTarget - a.start)) * 100);
+    color = 'amber';
+    milestone = a.evalTarget;
+  } else if (a.withdrawal) {
+    const base2 = a.mffu ? 0 : a.start;
+    rem   = Math.max(0, a.withdrawal.trigger - balance);
+    pct   = Math.min(100, ((balance - base2) / (a.withdrawal.trigger - base2)) * 100);
+    color = balance >= a.withdrawal.trigger ? 'green' : 'blue';
+    milestone = a.withdrawal.trigger;
+  }
+
+  return { balance, pnl, pct, rem, color, milestone };
+}
+
+function calRenderSummaryStrip() {
+  const strip = document.getElementById('cal-summary-strip');
+  // Gather all sessions in this month
+  const monthSessions = pnlLog.filter(l => {
+    const d = new Date(l.date + 'T12:00:00');
+    return d.getFullYear() === calYear && d.getMonth() === calMonth;
+  });
+
+  if (calSelectedAccount === 'all') {
+    const tradingDays = new Set(monthSessions.map(l => l.date)).size;
+    const monthTotal  = monthSessions.reduce((s, l) => s + l.totalPnl, 0);
+    const monthAvg    = tradingDays > 0 ? monthTotal / tradingDays / ACCOUNTS.length : 0;
+    const greenDays   = [...new Set(monthSessions.map(l=>l.date))].filter(d => {
+      return monthSessions.filter(s=>s.date===d).reduce((s,l)=>s+l.totalPnl,0) > 0;
+    }).length;
+    const redDays = tradingDays - greenDays;
+    strip.innerHTML = `
+      <div class="cal-sum-card"><div class="cs-label">Month P&amp;L (all)</div><div class="cs-val ${monthTotal>=0?'green':'red'}">${fmtS(monthTotal)}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Avg / day / acct</div><div class="cs-val ${monthAvg>=0?'green':'red'}">${fmtS(monthAvg)}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Trading days</div><div class="cs-val blue">${tradingDays}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Green days</div><div class="cs-val green">${greenDays}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Red days</div><div class="cs-val red">${redDays}</div></div>`;
+  } else {
+    const acctId = calSelectedAccount;
+    const a = ACCOUNTS.find(x => x.id === acctId);
+    const tradingDays = new Set(monthSessions.map(l => l.date)).size;
+    const monthPnl = monthSessions.reduce((sum, sess) => {
+      const entry = (sess.entries || []).find(e => e.accountId === acctId);
+      return sum + (entry ? entry.pnl : 0);
+    }, 0);
+    const greenDays = [...new Set(monthSessions.map(l=>l.date))].filter(d => calGetAccountPnl(d, acctId) > 0).length;
+    const state = calGetAccountStateOnDate(acctId, new Date().toISOString().split('T')[0]);
+    strip.innerHTML = `
+      <div class="cal-sum-card"><div class="cs-label">Month P&amp;L</div><div class="cs-val ${monthPnl>=0?'green':'red'}">${fmtS(monthPnl)}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Trading days</div><div class="cs-val blue">${tradingDays}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Green days</div><div class="cs-val green">${greenDays}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">Current balance</div><div class="cs-val">${state?fmt(state.balance):'—'}</div></div>
+      <div class="cal-sum-card"><div class="cs-label">% to milestone</div><div class="cs-val ${state?state.color:''}">${state?state.pct.toFixed(1)+'%':'—'}</div></div>`;
+  }
+}
+
+function calRenderGrid() {
+  const label = document.getElementById('cal-month-label');
+  label.textContent = new Date(calYear, calMonth, 1).toLocaleDateString('en-US', {month:'long', year:'numeric'});
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  const todayStr    = new Date().toISOString().split('T')[0];
+
+  const cells = [];
+  // Previous month padding
+  for (let i = firstDay - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrev - i, currentMonth: false, dateStr: null });
+  }
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const mm = String(calMonth + 1).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    cells.push({ day: d, currentMonth: true, dateStr: `${calYear}-${mm}-${dd}` });
+  }
+  // Next month padding
+  const remaining = 42 - cells.length;
+  for (let i = 1; i <= remaining; i++) {
+    cells.push({ day: i, currentMonth: false, dateStr: null });
+  }
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = cells.map(cell => {
+    if (!cell.currentMonth || !cell.dateStr) {
+      return `<div class="cal-cell other-month no-data"><div class="cal-day-num">${cell.day}</div></div>`;
+    }
+
+    const dateStr  = cell.dateStr;
+    const isToday  = dateStr === todayStr;
+    const sessions = calGetSessions(dateStr);
+    const hasData  = sessions.length > 0;
+    const isSelected = dateStr === calSelectedDate;
+
+    let innerHtml = '';
+    if (hasData) {
+      if (calSelectedAccount === 'all') {
+        const d = calGetAllPnl(dateStr);
+        innerHtml = `
+          <div class="cal-cell-pnl ${d.total>=0?'pos':'neg'}">${fmtS(d.total)}</div>
+          <div class="cal-cell-avg ${d.avg>=0?'pos':'neg'}">avg ${fmtS(d.avg)}</div>
+          <div class="cal-cell-dot ${d.total>=0?'green':'red'}"></div>`;
+      } else {
+        const pnl   = calGetAccountPnl(dateStr, calSelectedAccount);
+        const state = calGetAccountStateOnDate(calSelectedAccount, dateStr);
+        innerHtml = `
+          <div class="cal-cell-pnl ${pnl>=0?'pos':'neg'}">${fmtS(pnl)}</div>`;
+        if (state) {
+          innerHtml += `
+          <div class="cal-cell-milestone">
+            <div class="cal-cell-ms-bar"><div class="cal-cell-ms-fill ${state.color}" style="width:${state.pct.toFixed(1)}%"></div></div>
+            <div class="cal-cell-ms-text">${state.pct.toFixed(0)}% to goal</div>
+          </div>`;
+        }
+      }
+    }
+
+    return `<div class="cal-cell ${isToday?'today':''} ${hasData?'has-data':'no-data'} ${isSelected?'selected':''}"
+      data-date="${dateStr}"
+      onclick="${hasData?`calSelectDay('${dateStr}')`:''}">
+      <div class="cal-day-num">${cell.day}</div>
+      ${innerHtml}
+    </div>`;
+  }).join('');
+}
+
+window.calSelectDay = function(dateStr) {
+  calSelectedDate = calSelectedDate === dateStr ? null : dateStr;
+  calRenderGrid();
+  calRenderDetail();
+};
+
+function calRenderDetail() {
+  const panel = document.getElementById('cal-detail');
+  if (!calSelectedDate) { panel.style.display = 'none'; return; }
+
+  const sessions = calGetSessions(calSelectedDate);
+  if (!sessions.length) { panel.style.display = 'none'; return; }
+
+  panel.style.display = 'block';
+  const dateLabel = new Date(calSelectedDate + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  document.getElementById('cal-detail-date').textContent = dateLabel;
+
+  const body = document.getElementById('cal-detail-body');
+
+  if (calSelectedAccount === 'all') {
+    // Show all accounts
+    const totalPnl = sessions.reduce((s, l) => s + l.totalPnl, 0);
+    const note     = sessions.map(s => s.note).filter(Boolean).join(' · ');
+    const rows = ACCOUNTS.map(a => {
+      const pnl = calGetAccountPnl(calSelectedDate, a.id);
+      if (pnl === 0) return '';
+      return `<tr>
+        <td>${a.firm}</td>
+        <td class="mono">${a.id}</td>
+        <td class="${pnl>=0?'pos':'neg'}">${fmtS(pnl)}</td>
+      </tr>`;
+    }).join('');
+    body.innerHTML = `
+      ${note ? `<div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">📝 ${note}</div>` : ''}
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <div class="cal-ds-card"><div class="ds-label">Total P&amp;L</div><div class="ds-val ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl)}</div></div>
+        <div class="cal-ds-card"><div class="ds-label">Avg / account</div><div class="ds-val ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl/ACCOUNTS.length)}</div></div>
+      </div>
+      <table class="cal-detail-table">
+        <thead><tr><th>Firm</th><th>Account</th><th class="right">P&amp;L</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } else {
+    // Single account detail
+    const acctId = calSelectedAccount;
+    const a      = ACCOUNTS.find(x => x.id === acctId);
+    const pnl    = calGetAccountPnl(calSelectedDate, acctId);
+    const state  = calGetAccountStateOnDate(acctId, calSelectedDate);
+    const note   = sessions.map(s => s.note).filter(Boolean).join(' · ');
+
+    let milestoneLabel = '';
+    let milestoneTarget = '';
+    if (a.phase === 'eval') {
+      milestoneLabel  = 'Eval target';
+      milestoneTarget = fmt(a.evalTarget);
+    } else if (a.withdrawal) {
+      milestoneLabel  = 'Withdrawal trigger';
+      milestoneTarget = fmt(a.withdrawal.trigger);
+    }
+
+    body.innerHTML = `
+      ${note ? `<div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">📝 ${note}</div>` : ''}
+      <div class="cal-detail-single">
+        <div class="cal-ds-card"><div class="ds-label">P&amp;L this day</div><div class="ds-val ${pnl>=0?'green':'red'}">${fmtS(pnl)}</div></div>
+        <div class="cal-ds-card"><div class="ds-label">Balance after</div><div class="ds-val">${state?fmt(state.balance):'—'}</div></div>
+        <div class="cal-ds-card"><div class="ds-label">Total P&amp;L</div><div class="ds-val ${state&&state.pnl>=0?'green':'red'}">${state?fmtS(state.pnl):'—'}</div></div>
+        <div class="cal-ds-card"><div class="ds-label">% to milestone</div><div class="ds-val ${state?state.color:''}">${state?state.pct.toFixed(1)+'%':'—'}</div></div>
+      </div>
+      ${state && milestoneLabel ? `
+      <div class="cal-ms-detail">
+        <h4>${milestoneLabel}: ${milestoneTarget}</h4>
+        <div class="cal-ms-bar-lg"><div class="cal-ms-fill-lg ${state.color}" style="width:${state.pct.toFixed(1)}%"></div></div>
+        <div class="cal-ms-meta">
+          <span>${state.pct.toFixed(1)}% complete</span>
+          <span>${state.rem>0?fmt(state.rem)+' remaining':'✓ Target reached!'}</span>
+        </div>
+      </div>` : ''}`;
+  }
+}
+
+// Calendar controls
+document.getElementById('cal-prev').addEventListener('click', () => {
+  calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+  calSelectedDate = null;
+  document.getElementById('cal-detail').style.display = 'none';
+  calRenderSummaryStrip(); calRenderGrid();
+});
+document.getElementById('cal-next').addEventListener('click', () => {
+  calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+  calSelectedDate = null;
+  document.getElementById('cal-detail').style.display = 'none';
+  calRenderSummaryStrip(); calRenderGrid();
+});
+document.getElementById('cal-today').addEventListener('click', () => {
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+  calSelectedDate = null;
+  document.getElementById('cal-detail').style.display = 'none';
+  calRenderSummaryStrip(); calRenderGrid();
+});
+document.getElementById('cal-account-select').addEventListener('change', function() {
+  calSelectedAccount = this.value;
+  calSelectedDate = null;
+  document.getElementById('cal-detail').style.display = 'none';
+  calRenderSummaryStrip(); calRenderGrid();
+});
+document.getElementById('cal-detail-close').addEventListener('click', () => {
+  calSelectedDate = null;
+  document.getElementById('cal-detail').style.display = 'none';
+  calRenderGrid();
+});
+
+function renderCalendar() {
+  calPopulateSelect();
+  calRenderSummaryStrip();
+  calRenderGrid();
+  calRenderDetail();
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
