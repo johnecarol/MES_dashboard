@@ -115,11 +115,47 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
 .feedback{font-size:12px;}
 .feedback.ok{color:var(--green);}.feedback.err{color:var(--red);}
 
-/* Target row */
-.target-row{display:flex;align-items:center;gap:12px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:16px;flex-wrap:wrap;}
-.target-row label{font-size:13px;color:var(--text-2);white-space:nowrap;}
-.target-row input{width:90px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:14px;font-family:var(--mono);padding:6px 10px;outline:none;transition:border-color .12s;}
-.target-row input:focus{border-color:var(--blue);}
+/* Accounts toolbar */
+.acct-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+
+/* Manage panel */
+.manage-panel{background:var(--surface-1);border:1px solid var(--border-hi);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;display:none;}
+.manage-panel.open{display:block;}
+.manage-panel h2{font-size:14px;font-weight:500;margin-bottom:6px;}
+.manage-panel p{font-size:12px;color:var(--text-3);margin-bottom:16px;}
+.manage-grid{display:flex;flex-direction:column;gap:10px;}
+.manage-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.manage-card .mc-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.manage-card .mc-firm{font-size:11px;color:var(--text-3);min-width:70px;}
+.manage-card .mc-id{font-size:12px;font-family:var(--mono);color:var(--text-2);}
+.manage-card .mc-badge{margin-left:auto;}
+.manage-card .mc-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:10px;}
+.mc-field{display:flex;flex-direction:column;gap:4px;}
+.mc-field label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;}
+.mc-field input{background:var(--bg);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:12px;font-family:var(--mono);padding:6px 8px;outline:none;transition:border-color .12s;}
+.mc-field input:focus{border-color:var(--blue);}
+.mc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.btn-upgrade{background:var(--green-bg);color:var(--green);border:1px solid var(--green-dim);border-radius:var(--radius);font-size:12px;font-weight:500;padding:6px 14px;cursor:pointer;font-family:var(--sans);transition:all .12s;white-space:nowrap;}
+.btn-upgrade:hover{background:var(--green);color:#fff;}
+.btn-save-acct{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue);border-radius:var(--radius);font-size:12px;font-weight:500;padding:6px 14px;cursor:pointer;font-family:var(--sans);transition:all .12s;white-space:nowrap;}
+.btn-save-acct:hover{background:var(--blue);color:#fff;}
+.mc-feedback{font-size:11px;color:var(--green);}
+
+/* Upgrade modal overlay */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface-1);border:1px solid var(--border-hi);border-radius:var(--radius-lg);padding:24px;width:500px;max-width:90vw;}
+.modal-box h2{font-size:16px;font-weight:600;margin-bottom:6px;}
+.modal-box p{font-size:12px;color:var(--text-3);margin-bottom:18px;}
+.modal-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.modal-field{display:flex;flex-direction:column;gap:5px;}
+.modal-field label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;}
+.modal-field input,.modal-field select{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--radius);color:var(--text-1);font-size:13px;font-family:var(--sans);padding:8px 10px;outline:none;transition:border-color .12s;}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--blue);}
+.modal-field.full{grid-column:1/-1;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+
+/* Target row removed - keep hint style just in case */
 .hint{font-size:12px;color:var(--text-3);}
 
 /* Withdrawals */
@@ -329,12 +365,32 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
       <p>All 20 accounts across TakeProfit, Blusky, Lucid, MFFU, Tradeify</p>
     </div>
     <div class="kpi-strip" id="kpi-strip"></div>
-    <div class="target-row">
-      <label>Daily target / account</label>
-      <input type="number" id="daily-target" value="100" min="1" step="1"/>
-      <span class="hint" id="daily-hint"></span>
-      <button class="btn-secondary" id="toggle-bulk-btn" style="margin-left:auto;">⟳ Sync balances</button>
-      <span class="feedback" id="bulk-feedback"></span>
+    <div class="acct-toolbar">
+      <div class="chips" id="firm-chips">
+        <button class="chip active" data-firm="all">All firms</button>
+        <button class="chip" data-firm="TakeProfit">TakeProfit</button>
+        <button class="chip" data-firm="Blusky">Blusky</button>
+        <button class="chip" data-firm="Lucid">Lucid</button>
+        <button class="chip" data-firm="MFFU">MFFU</button>
+        <button class="chip" data-firm="Tradeify">Tradeify</button>
+      </div>
+      <div class="chips" id="phase-chips">
+        <button class="chip active" data-filter="all">All phases</button>
+        <button class="chip" data-filter="eval">Eval</button>
+        <button class="chip" data-filter="funded">Funded</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap;">
+        <button class="btn-secondary" id="toggle-manage-btn">✎ Manage accounts</button>
+        <button class="btn-secondary" id="toggle-bulk-btn">⟳ Sync balances</button>
+        <span class="feedback" id="bulk-feedback"></span>
+      </div>
+    </div>
+
+    <!-- Manage accounts panel -->
+    <div class="manage-panel" id="manage-panel">
+      <h2>Manage accounts</h2>
+      <p>Rename an account, upgrade an eval account to funded, or edit withdrawal rules.</p>
+      <div class="manage-grid" id="manage-grid"></div>
     </div>
     <div class="bulk-panel" id="bulk-panel">
       <h2>Sync balances from copy trader</h2>
@@ -346,14 +402,6 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
       </div>
     </div>
     <div class="section">
-      <div class="section-header">
-        <div class="section-title">All accounts</div>
-        <div class="chips">
-          <button class="chip active" data-filter="all">All</button>
-          <button class="chip" data-filter="eval">Eval</button>
-          <button class="chip" data-filter="funded">Funded</button>
-        </div>
-      </div>
       <div class="accounts-wrap">
         <table class="accounts-table">
           <thead><tr>
@@ -478,12 +526,46 @@ body{background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:
     </div>
   </div>
 
+<!-- Upgrade modal -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal-box">
+    <h2>Upgrade to Funded</h2>
+    <p>Enter the new funded account details. The eval account will be replaced with these settings.</p>
+    <div class="modal-fields">
+      <div class="modal-field full">
+        <label>New account ID (from prop firm)</label>
+        <input type="text" id="upg-id" placeholder="e.g. TAKEPROFITFUNDED123456"/>
+      </div>
+      <div class="modal-field">
+        <label>Starting balance</label>
+        <input type="number" id="upg-balance" placeholder="e.g. 25000" step="0.01"/>
+      </div>
+      <div class="modal-field">
+        <label>Withdrawal trigger</label>
+        <input type="number" id="upg-trigger" step="0.01"/>
+      </div>
+      <div class="modal-field">
+        <label>After withdrawal balance</label>
+        <input type="number" id="upg-after" step="0.01"/>
+      </div>
+      <div class="modal-field">
+        <label>Floor (locked drawdown)</label>
+        <input type="number" id="upg-floor" step="0.01"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="upg-cancel">Cancel</button>
+      <button class="btn-primary" id="upg-confirm">Upgrade account</button>
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 
 <script>
 // ─── Account definitions ──────────────────────────────────────────────────────
-const ACCOUNTS = [
+const BASE_ACCOUNTS = [
   {firm:'TakeProfit', id:'TAKEPROFIT319314202',    start:25000,  phase:'eval',   evalTarget:26500,  withdrawal:null},
   {firm:'TakeProfit', id:'TAKEPROFITPRO185572638', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
   {firm:'TakeProfit', id:'TAKEPROFITPRO263657073', start:25000,  phase:'funded', evalTarget:null,   withdrawal:{trigger:27700,  after:26700,  floor:26500}},
@@ -518,35 +600,51 @@ const DEFAULT_BALANCES = {
 };
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
-function loadLog() {
-  try { return JSON.parse(localStorage.getItem('mes_pnl_log_v2') || '[]'); } catch { return []; }
-}
-function loadBal() {
+function loadLog()  { try{return JSON.parse(localStorage.getItem('mes_pnl_log_v2')||'[]');}catch{return[];} }
+function loadBal()  {
   try {
-    // Migrate from v1 if v2 is empty
-    const v2 = localStorage.getItem('mes_balances_v2');
-    if (v2) return JSON.parse(v2);
-    const v1 = localStorage.getItem('mes_balances_v1');
-    if (v1) {
-      const migrated = JSON.parse(v1);
-      localStorage.setItem('mes_balances_v2', JSON.stringify(migrated));
-      return migrated;
-    }
+    const v2=localStorage.getItem('mes_balances_v2');
+    if(v2) return JSON.parse(v2);
+    const v1=localStorage.getItem('mes_balances_v1');
+    if(v1){ const m=JSON.parse(v1); localStorage.setItem('mes_balances_v2',JSON.stringify(m)); return m; }
     return {};
   } catch { return {}; }
 }
-function saveLog(d) { localStorage.setItem('mes_pnl_log_v2', JSON.stringify(d)); }
-function saveBal(d) { localStorage.setItem('mes_balances_v2', JSON.stringify(d)); }
+function loadOverrides() { try{return JSON.parse(localStorage.getItem('mes_acct_overrides')||'[]');}catch{return[];} }
+function saveLog(d)       { localStorage.setItem('mes_pnl_log_v2', JSON.stringify(d)); }
+function saveBal(d)       { localStorage.setItem('mes_balances_v2', JSON.stringify(d)); }
+function saveOverrides(d) { localStorage.setItem('mes_acct_overrides', JSON.stringify(d)); }
 
-let pnlLog = loadLog();
-let balStore = loadBal(); // { id: { balance, ts, source } }  source: 'manual' | 'log'
+let pnlLog    = loadLog();
+let balStore  = loadBal();
+let overrides = loadOverrides(); // [{origId, newId, firm, phase, start, withdrawal, mffu}]
 let activeFilter = 'all';
-let lossMode = false;
+let activeFirm   = 'all';
+let lossMode     = false;
+
+// ─── Dynamic account list ─────────────────────────────────────────────────────
+function getAccounts() {
+  return BASE_ACCOUNTS.map(a => {
+    const ov = overrides.find(o => o.origId === a.id);
+    if (!ov) return {...a, origId: a.id};
+    return {
+      ...a,
+      origId:     a.id,
+      id:         ov.newId      !== undefined ? ov.newId      : a.id,
+      firm:       ov.firm       !== undefined ? ov.firm       : a.firm,
+      phase:      ov.phase      !== undefined ? ov.phase      : a.phase,
+      start:      ov.start      !== undefined ? ov.start      : a.start,
+      evalTarget: ov.phase === 'funded'       ? null          : a.evalTarget,
+      withdrawal: ov.withdrawal !== undefined ? ov.withdrawal : a.withdrawal,
+      mffu:       ov.mffu       !== undefined ? ov.mffu       : a.mffu,
+    };
+  });
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const fmt  = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtS = n => (n>=0?'+':'')+fmt(n);
-const getDT = () => parseFloat(document.getElementById('daily-target').value)||100;
+const getDT = () => 100; // fixed $100 daily reference for days-to-goal calculations
 
 function getBal(a) {
   return balStore[a.id] ? balStore[a.id].balance : DEFAULT_BALANCES[a.id];
@@ -567,7 +665,7 @@ function applyPnlToBalances(entries) {
   const now = new Date().toISOString();
   entries.forEach(e => {
     if (e.pnl === 0) return;
-    const a = ACCOUNTS.find(x => x.id === e.accountId);
+    const a = getAccounts().find(x => x.id === e.accountId);
     if (!a) return;
     // Always read current balance fresh from balStore or default
     const curBal = balStore[a.id] ? balStore[a.id].balance : DEFAULT_BALANCES[a.id];
@@ -609,20 +707,19 @@ function fmtTs(a) {
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 function renderKPIs() {
-  const totalPnl = ACCOUNTS.reduce((s,a) => s+getPnl(a), 0);
-  const evalC    = ACCOUNTS.filter(a => a.phase==='eval').length;
-  const fundC    = ACCOUNTS.filter(a => a.phase==='funded').length;
-  const readyC   = ACCOUNTS.filter(a => a.withdrawal && getBal(a)>=a.withdrawal.trigger).length;
-  const dt       = getDT();
+  const ACCTS    = getAccounts();
+  const totalPnl = ACCTS.reduce((s,a) => s+getPnl(a), 0);
+  const evalC    = ACCTS.filter(a => a.phase==='eval').length;
+  const fundC    = ACCTS.filter(a => a.phase==='funded').length;
+  const readyC   = ACCTS.filter(a => a.withdrawal && getBal(a)>=a.withdrawal.trigger).length;
   document.getElementById('nav-badge-w').textContent = readyC;
   document.getElementById('kpi-strip').innerHTML = `
     <div class="kpi-card"><div class="k-label">Total P&amp;L</div><div class="k-value ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl)}</div><div class="k-sub">all accounts combined</div></div>
-    <div class="kpi-card"><div class="k-label">Accounts</div><div class="k-value">${ACCOUNTS.length}</div><div class="k-sub">across 5 firms</div></div>
+    <div class="kpi-card"><div class="k-label">Accounts</div><div class="k-value">${ACCTS.length}</div><div class="k-sub">across 5 firms</div></div>
     <div class="kpi-card"><div class="k-label">In eval</div><div class="k-value amber">${evalC}</div><div class="k-sub">working toward pass</div></div>
     <div class="kpi-card"><div class="k-label">Funded</div><div class="k-value green">${fundC}</div><div class="k-sub">drawdown locked</div></div>
-    <div class="kpi-card"><div class="k-label">Ready to withdraw</div><div class="k-value ${readyC>0?'green':'blue'}">${readyC}</div><div class="k-sub">at trigger balance</div></div>
-    <div class="kpi-card"><div class="k-label">Daily target</div><div class="k-value blue">${fmt(dt*ACCOUNTS.length)}</div><div class="k-sub">${fmt(dt)} × ${ACCOUNTS.length} accounts</div></div>`;
-  const fW = ACCOUNTS.filter(a => a.withdrawal);
+    <div class="kpi-card"><div class="k-label">Ready to withdraw</div><div class="k-value ${readyC>0?'green':'blue'}">${readyC}</div><div class="k-sub">at trigger balance</div></div>`;
+  const fW = getAccounts().filter(a => a.withdrawal);
   const needed = fW.reduce((s,a) => s+Math.max(0,a.withdrawal.trigger-getBal(a)), 0);
   document.getElementById('w-kpi-strip').innerHTML = `
     <div class="kpi-card"><div class="k-label">Funded accounts</div><div class="k-value">${fW.length}</div><div class="k-sub">with withdrawal target</div></div>
@@ -633,7 +730,9 @@ function renderKPIs() {
 
 // ─── Accounts table ───────────────────────────────────────────────────────────
 function renderAccounts() {
-  const list = activeFilter==='all' ? ACCOUNTS : ACCOUNTS.filter(a => a.phase===activeFilter);
+  let list = getAccounts();
+  if (activeFirm   !== 'all') list = list.filter(a => a.firm === activeFirm);
+  if (activeFilter !== 'all') list = list.filter(a => a.phase === activeFilter);
   document.getElementById('accounts-tbody').innerHTML = list.map(a => {
     const bal  = getBal(a);
     const pnl  = getPnl(a);
@@ -664,7 +763,7 @@ function renderAccounts() {
 
 // ─── Bulk sync panel ──────────────────────────────────────────────────────────
 function renderBulkGrid() {
-  document.getElementById('bulk-grid').innerHTML = ACCOUNTS.map(a => `
+  document.getElementById('bulk-grid').innerHTML = getAccounts().map(a => `
     <div class="bulk-card">
       <div class="bc-info">
         <div class="bc-firm">${a.firm}</div>
@@ -691,7 +790,7 @@ document.getElementById('cancel-bulk-btn').addEventListener('click', () => {
 document.getElementById('save-bulk-btn').addEventListener('click', () => {
   let updated = 0;
   const now = new Date().toISOString();
-  ACCOUNTS.forEach(a => {
+  getAccounts().forEach(a => {
     const inp = document.getElementById('bulk-'+a.id);
     if (!inp) return;
     const val = parseFloat(inp.value);
@@ -711,7 +810,7 @@ document.getElementById('save-bulk-btn').addEventListener('click', () => {
 // ─── Withdrawals ──────────────────────────────────────────────────────────────
 function renderWithdrawals() {
   const dt = getDT();
-  document.getElementById('withdraw-grid').innerHTML = ACCOUNTS.filter(a => a.withdrawal).map(a => {
+  document.getElementById('withdraw-grid').innerHTML = getAccounts().filter(a => a.withdrawal).map(a => {
     const w = a.withdrawal, bal = getBal(a);
     const rem   = Math.max(0, w.trigger - bal);
     const ready = bal >= w.trigger;
@@ -735,7 +834,7 @@ function renderWithdrawals() {
 
 // ─── Per-account logger ───────────────────────────────────────────────────────
 function renderPerAccountGrid() {
-  document.getElementById('per-account-grid').innerHTML = ACCOUNTS.map(a => `
+  document.getElementById('per-account-grid').innerHTML = getAccounts().map(a => `
     <div class="pa-card" id="pac-${a.id}">
       <div class="pa-info">
         <div class="pa-firm">${a.firm}</div>
@@ -764,7 +863,7 @@ document.getElementById('fill-all-btn').addEventListener('click', () => {
   const raw = parseFloat(document.getElementById('fill-all-val').value);
   if (isNaN(raw)) return;
   const val = lossMode ? -Math.abs(raw) : raw;
-  ACCOUNTS.forEach(a => {
+  getAccounts().forEach(a => {
     const inp = document.getElementById('pa-'+a.id);
     if (inp) { inp.value = val; window.colorPa(inp); }
   });
@@ -778,7 +877,7 @@ document.getElementById('add-log-btn').addEventListener('click', () => {
   const fb   = document.getElementById('log-feedback');
   if (!date) { fb.textContent='Please select a date.'; fb.className='feedback err'; return; }
 
-  const entries = ACCOUNTS.map(a => {
+  const entries = getAccounts().map(a => {
     const inp = document.getElementById('pa-'+a.id);
     let v = inp ? parseFloat(inp.value) : NaN;
     if (isNaN(v)) v = 0;
@@ -799,7 +898,7 @@ document.getElementById('add-log-btn').addEventListener('click', () => {
   applyPnlToBalances(entries);
 
   // Clear inputs
-  ACCOUNTS.forEach(a => {
+  getAccounts().forEach(a => {
     const inp = document.getElementById('pa-'+a.id);
     if (inp) { inp.value=''; inp.classList.remove('pos','neg'); }
   });
@@ -865,7 +964,7 @@ function renderHistory() {
         <span class="hd-meta">
           ${sess.note?`<span class="hd-note">${sess.note}</span>`:''}
           <span class="hd-total ${sess.totalPnl>=0?'pos':'neg'}">${fmtS(sess.totalPnl)} total</span>
-          <span style="font-size:11px;opacity:.7;color:var(--text-3)">(avg ${fmtS(sess.totalPnl/ACCOUNTS.length)}/acct)</span>
+          <span style="font-size:11px;opacity:.7;color:var(--text-3)">(avg ${fmtS(sess.totalPnl/getAccounts().length)}/acct)</span>
           <button class="hd-del" onclick="event.stopPropagation();deleteSession('${sess.id}')">✕</button>
           <span class="hd-toggle" id="hdicon-${sess.id}">▸</span>
         </span>
@@ -889,7 +988,7 @@ function renderStats() {
   const totals    = pnlLog.map(l=>l.totalPnl);
   const total     = totals.reduce((s,v)=>s+v,0);
   const avgTotal  = total/pnlLog.length;
-  const avgPerAcct= avgTotal/ACCOUNTS.length;
+  const avgPerAcct= avgTotal/getAccounts().length;
   const greenDays = pnlLog.filter(l=>l.totalPnl>0).length;
   const redDays   = pnlLog.filter(l=>l.totalPnl<0).length;
   const best=Math.max(...totals), worst=Math.min(...totals);
@@ -899,7 +998,7 @@ function renderStats() {
   const at={};
   pnlLog.forEach(s=>(s.entries||[]).forEach(e=>{at[e.accountId]=(at[e.accountId]||0)+e.pnl;}));
   const bestId=Object.keys(at).sort((a,b)=>at[b]-at[a])[0];
-  const bestA=ACCOUNTS.find(a=>a.id===bestId);
+  const bestA=getAccounts().find(a=>a.id===bestId);
   document.getElementById('stats-grid').innerHTML=`
     <div class="stat-card"><h3>Session summary</h3>
       <div class="stat-row"><span class="s-label">Sessions logged</span><span class="s-val">${pnlLog.length}</span></div>
@@ -911,8 +1010,8 @@ function renderStats() {
     <div class="stat-card"><h3>P&amp;L per account (avg)</h3>
       <div class="stat-row"><span class="s-label">Average / session</span><span class="s-val ${avgPerAcct>=0?'green':'red'}">${fmtS(avgPerAcct)}</span></div>
       <div class="stat-row"><span class="s-label">Days to $${dt} target</span><span class="s-val amber">${daysToGoal}</span></div>
-      <div class="stat-row"><span class="s-label">Best session</span><span class="s-val green">${fmtS(best/ACCOUNTS.length)}</span></div>
-      <div class="stat-row"><span class="s-label">Worst session</span><span class="s-val red">${fmtS(worst/ACCOUNTS.length)}</span></div>
+      <div class="stat-row"><span class="s-label">Best session</span><span class="s-val green">${fmtS(best/getAccounts().length)}</span></div>
+      <div class="stat-row"><span class="s-label">Worst session</span><span class="s-val red">${fmtS(worst/getAccounts().length)}</span></div>
     </div>
     <div class="stat-card"><h3>Total across all accounts</h3>
       <div class="stat-row"><span class="s-label">Cumulative P&amp;L</span><span class="s-val ${total>=0?'green':'red'}">${fmtS(total)}</span></div>
@@ -926,6 +1025,155 @@ function renderStats() {
       <div class="stat-row"><span class="s-label">Cumulative P&amp;L</span><span class="s-val green">${bestId?fmtS(at[bestId]):'—'}</span></div>
     </div>`;
 }
+
+// ─── Manage accounts panel ────────────────────────────────────────────────────
+function renderManageGrid() {
+  const ACCTS = getAccounts();
+  document.getElementById('manage-grid').innerHTML = ACCTS.map(a => {
+    const isEval = a.phase === 'eval';
+    const badge  = isEval
+      ? `<span class="badge eval">Eval</span>`
+      : `<span class="badge funded">Funded</span>`;
+    return `<div class="manage-card" id="mc-${a.origId}">
+      <div class="mc-header">
+        <span class="mc-firm">${a.firm}</span>
+        <span class="mc-id">${a.id}</span>
+        <span class="mc-badge">${badge}</span>
+      </div>
+      <div class="mc-fields">
+        <div class="mc-field">
+          <label>Account ID</label>
+          <input type="text" id="mc-id-${a.origId}" value="${a.id}" placeholder="Account ID"/>
+        </div>
+        <div class="mc-field">
+          <label>Firm name</label>
+          <input type="text" id="mc-firm-${a.origId}" value="${a.firm}" placeholder="Firm"/>
+        </div>
+      </div>
+      <div class="mc-actions">
+        <button class="btn-save-acct" onclick="saveAcctEdit('${a.origId}')">Save changes</button>
+        ${isEval ? `<button class="btn-upgrade" onclick="openUpgradeModal('${a.origId}')">⬆ Upgrade to funded</button>` : ''}
+        <span class="mc-feedback" id="mc-fb-${a.origId}"></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.saveAcctEdit = function(origId) {
+  const newId  = document.getElementById('mc-id-'+origId).value.trim();
+  const newFirm= document.getElementById('mc-firm-'+origId).value.trim();
+  if (!newId || !newFirm) return;
+  const existing = overrides.find(o => o.origId === origId);
+  if (existing) {
+    existing.newId = newId;
+    existing.firm  = newFirm;
+  } else {
+    overrides.push({ origId, newId, firm: newFirm });
+  }
+  saveOverrides(overrides);
+  // Update balStore key if ID changed
+  const base = BASE_ACCOUNTS.find(a => a.id === origId);
+  if (base && newId !== origId && balStore[origId]) {
+    balStore[newId] = balStore[origId];
+    delete balStore[origId];
+    saveBal(balStore);
+  }
+  const fb = document.getElementById('mc-fb-'+origId);
+  if (fb) { fb.textContent = 'Saved ✓'; setTimeout(() => fb.textContent='', 2000); }
+  renderManageGrid();
+  renderAll();
+};
+
+// Upgrade modal
+let upgradeTargetOrigId = null;
+window.openUpgradeModal = function(origId) {
+  upgradeTargetOrigId = origId;
+  const a = getAccounts().find(x => x.origId === origId);
+  if (!a) return;
+  // Pre-fill defaults based on firm
+  const defaults = {
+    'TakeProfit': {trigger:27700, after:26700, floor:26500},
+    'Tradeify':   {trigger:27700, after:26700, floor:26500},
+    'Lucid':      {trigger:27450, after:26450, floor:26250},
+    'MFFU':       {trigger:2700,  after:1700,  floor:1500},
+    'Blusky':     {trigger:153200,after:152200,floor:152000},
+  };
+  const d = defaults[a.firm] || {};
+  document.getElementById('upg-id').value      = '';
+  document.getElementById('upg-balance').value = a.start || 25000;
+  document.getElementById('upg-trigger').value = d.trigger || '';
+  document.getElementById('upg-after').value   = d.after   || '';
+  document.getElementById('upg-floor').value   = d.floor   || '';
+  document.getElementById('upgrade-modal').classList.add('open');
+};
+
+document.getElementById('upg-cancel').addEventListener('click', () => {
+  document.getElementById('upgrade-modal').classList.remove('open');
+  upgradeTargetOrigId = null;
+});
+
+document.getElementById('upg-confirm').addEventListener('click', () => {
+  if (!upgradeTargetOrigId) return;
+  const newId   = document.getElementById('upg-id').value.trim();
+  const balance = parseFloat(document.getElementById('upg-balance').value);
+  const trigger = parseFloat(document.getElementById('upg-trigger').value);
+  const after   = parseFloat(document.getElementById('upg-after').value);
+  const floor   = parseFloat(document.getElementById('upg-floor').value);
+  if (!newId || isNaN(balance) || isNaN(trigger) || isNaN(after) || isNaN(floor)) {
+    alert('Please fill in all fields.'); return;
+  }
+  const existing = overrides.find(o => o.origId === upgradeTargetOrigId);
+  const upgData  = {
+    origId:     upgradeTargetOrigId,
+    newId,
+    phase:      'funded',
+    start:      balance,
+    withdrawal: { trigger, after, floor },
+  };
+  if (existing) { Object.assign(existing, upgData); }
+  else { overrides.push(upgData); }
+  saveOverrides(overrides);
+  // Set starting balance
+  const now = new Date().toISOString();
+  balStore[newId] = { balance, ts: now, source: 'manual' };
+  // Remove old ID from balStore if renamed
+  if (newId !== upgradeTargetOrigId && balStore[upgradeTargetOrigId]) {
+    delete balStore[upgradeTargetOrigId];
+  }
+  saveBal(balStore);
+  document.getElementById('upgrade-modal').classList.remove('open');
+  upgradeTargetOrigId = null;
+  renderManageGrid();
+  renderAll();
+});
+
+// Manage panel toggle
+document.getElementById('toggle-manage-btn').addEventListener('click', () => {
+  const panel = document.getElementById('manage-panel');
+  const btn   = document.getElementById('toggle-manage-btn');
+  const open  = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '✕ Close' : '✎ Manage accounts';
+  if (open) renderManageGrid();
+});
+
+// Firm filter chips
+document.getElementById('firm-chips').addEventListener('click', e => {
+  const btn = e.target.closest('[data-firm]');
+  if (!btn) return;
+  activeFirm = btn.dataset.firm;
+  document.querySelectorAll('[data-firm]').forEach(b => b.classList.toggle('active', b === btn));
+  renderAccounts();
+});
+
+// Phase filter chips
+document.getElementById('phase-chips').addEventListener('click', e => {
+  const btn = e.target.closest('[data-filter]');
+  if (!btn) return;
+  activeFilter = btn.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b === btn));
+  renderAccounts();
+});
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
@@ -941,20 +1189,10 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
     }
   });
 });
-document.querySelectorAll('.chip[data-filter]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activeFilter = btn.dataset.filter;
-    document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderAccounts();
-  });
-});
-document.getElementById('daily-target').addEventListener('input', renderAll);
+document.getElementById('daily-target') && document.getElementById('daily-target').addEventListener('input', renderAll);
 
 function renderAll() {
   renderKPIs(); renderAccounts(); renderWithdrawals(); renderHistory(); renderStats();
-  const dt = getDT();
-  document.getElementById('daily-hint').textContent = `= ${fmt(dt*ACCOUNTS.length)} total across ${ACCOUNTS.length} accounts`;
 }
 
 // ─── Calendar ────────────────────────────────────────────────────────────────
@@ -967,7 +1205,7 @@ function calPopulateSelect() {
   const sel = document.getElementById('cal-account-select');
   // Keep first option (all), rebuild the rest
   while (sel.options.length > 1) sel.remove(1);
-  ACCOUNTS.forEach(a => {
+  getAccounts().forEach(a => {
     const opt = document.createElement('option');
     opt.value = a.id;
     opt.textContent = a.firm + ' · ' + a.id;
@@ -995,13 +1233,13 @@ function calGetAllPnl(dateStr) {
   const sessions = calGetSessions(dateStr);
   if (!sessions.length) return null;
   const total = sessions.reduce((s, sess) => s + sess.totalPnl, 0);
-  return { total, avg: total / ACCOUNTS.length };
+  return { total, avg: total / getAccounts().length };
 }
 
 // Get balance + progress for an account on a specific date
 // Reconstruct by replaying all sessions up to and including dateStr
 function calGetAccountStateOnDate(accountId, dateStr) {
-  const a = ACCOUNTS.find(x => x.id === accountId);
+  const a = getAccounts().find(x => x.id === accountId);
   if (!a) return null;
 
   // Sum all logged P&L for this account up to and including dateStr
@@ -1046,7 +1284,7 @@ function calRenderSummaryStrip() {
   if (calSelectedAccount === 'all') {
     const tradingDays = new Set(monthSessions.map(l => l.date)).size;
     const monthTotal  = monthSessions.reduce((s, l) => s + l.totalPnl, 0);
-    const monthAvg    = tradingDays > 0 ? monthTotal / tradingDays / ACCOUNTS.length : 0;
+    const monthAvg    = tradingDays > 0 ? monthTotal / tradingDays / getAccounts().length : 0;
     const greenDays   = [...new Set(monthSessions.map(l=>l.date))].filter(d => {
       return monthSessions.filter(s=>s.date===d).reduce((s,l)=>s+l.totalPnl,0) > 0;
     }).length;
@@ -1059,7 +1297,7 @@ function calRenderSummaryStrip() {
       <div class="cal-sum-card"><div class="cs-label">Red days</div><div class="cs-val red">${redDays}</div></div>`;
   } else {
     const acctId = calSelectedAccount;
-    const a = ACCOUNTS.find(x => x.id === acctId);
+    const a = getAccounts().find(x => x.id === acctId);
     const tradingDays = new Set(monthSessions.map(l => l.date)).size;
     const monthPnl = monthSessions.reduce((sum, sess) => {
       const entry = (sess.entries || []).find(e => e.accountId === acctId);
@@ -1169,7 +1407,7 @@ function calRenderDetail() {
     // Show all accounts
     const totalPnl = sessions.reduce((s, l) => s + l.totalPnl, 0);
     const note     = sessions.map(s => s.note).filter(Boolean).join(' · ');
-    const rows = ACCOUNTS.map(a => {
+    const rows = getAccounts().map(a => {
       const pnl = calGetAccountPnl(calSelectedDate, a.id);
       if (pnl === 0) return '';
       return `<tr>
@@ -1182,7 +1420,7 @@ function calRenderDetail() {
       ${note ? `<div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">📝 ${note}</div>` : ''}
       <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
         <div class="cal-ds-card"><div class="ds-label">Total P&amp;L</div><div class="ds-val ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl)}</div></div>
-        <div class="cal-ds-card"><div class="ds-label">Avg / account</div><div class="ds-val ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl/ACCOUNTS.length)}</div></div>
+        <div class="cal-ds-card"><div class="ds-label">Avg / account</div><div class="ds-val ${totalPnl>=0?'green':'red'}">${fmtS(totalPnl/getAccounts().length)}</div></div>
       </div>
       <table class="cal-detail-table">
         <thead><tr><th>Firm</th><th>Account</th><th class="right">P&amp;L</th></tr></thead>
@@ -1191,7 +1429,7 @@ function calRenderDetail() {
   } else {
     // Single account detail
     const acctId = calSelectedAccount;
-    const a      = ACCOUNTS.find(x => x.id === acctId);
+    const a      = getAccounts().find(x => x.id === acctId);
     const pnl    = calGetAccountPnl(calSelectedDate, acctId);
     const state  = calGetAccountStateOnDate(acctId, calSelectedDate);
     const note   = sessions.map(s => s.note).filter(Boolean).join(' · ');
