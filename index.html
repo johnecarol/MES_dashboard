@@ -558,6 +558,7 @@ function renderCardBody(a) {
   const payoutSection = a.phase === 'funded' ? `
     <div class="payout-box ${isReady?'ready-box':''}">
       <h4>${isReady ? '💰 Ready to withdraw' : 'Log a payout'} ${isReady?`<span class="ready-pill">balance ≥ trigger</span>`:''}</h4>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;">Fill this in, then click <strong style="color:var(--green)">"Log this payout"</strong> below — not "Save account details" (that button is only for editing the fields further down).</div>
       <div class="payout-form">
         <div class="field">
           <label>Payout amount ($)</label>
@@ -572,7 +573,7 @@ function renderCardBody(a) {
           <input type="number" step="0.01" id="po-after-${a.id}" placeholder="e.g. 26700"/>
         </div>
       </div>
-      <button class="btn btn-green btn-sm" data-action="log-payout" data-id="${a.id}">Log payout</button>
+      <button class="btn btn-green btn-sm" data-action="log-payout" data-id="${a.id}" style="font-weight:600;">✓ Log this payout</button>
       <span class="acct-save-fb" id="po-fb-${a.id}" style="margin-left:8px;"></span>
       ${payouts.length ? `
       <div class="payout-history">
@@ -637,7 +638,7 @@ function renderCardBody(a) {
 
     <!-- Actions -->
     <div class="acct-body-actions">
-      <button class="btn btn-primary btn-sm" data-action="save-card" data-id="${a.id}">Save changes</button>
+      <button class="btn btn-primary btn-sm" data-action="save-card" data-id="${a.id}">💾 Save account details</button>
       ${a.phase==='eval'?`<button class="btn btn-green btn-sm" data-action="upgrade" data-id="${a.id}">⬆ Upgrade to funded</button>`:''}
       <button class="btn btn-ghost btn-sm" data-action="edit-modal" data-id="${a.id}">Edit details</button>
       <button class="btn btn-danger btn-sm" data-action="remove" data-id="${a.id}">Remove account</button>
