@@ -141,6 +141,37 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px
 .empty .empty-icon{font-size:32px;margin-bottom:12px;opacity:.4;}
 .empty p{margin-bottom:16px;}
 
+/* ── Payout UI ── */
+.ready-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);font-weight:600;margin-left:6px;white-space:nowrap;}
+.payout-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;}
+.payout-box.ready-box{border-color:var(--green-dim);background:var(--green-bg);}
+.payout-box h4{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;}
+.payout-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:10px;}
+.payout-form .field label{font-size:10px;}
+.payout-history{margin-top:10px;}
+.payout-hist-row{display:grid;grid-template-columns:90px 1fr 1fr 1fr;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:center;}
+.payout-hist-row:last-child{border-bottom:none;}
+.payout-hist-row .ph-date{color:var(--t3);font-family:var(--mono);font-size:11px;}
+.payout-hist-row .ph-amt{color:var(--green);font-family:var(--mono);font-weight:500;text-align:right;}
+.payout-hist-row .ph-split{color:var(--t3);font-family:var(--mono);font-size:11px;text-align:right;}
+.payout-hist-row .ph-del{text-align:right;}
+.payout-hist-row .ph-del button{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;}
+.payout-hist-row .ph-del button:hover{color:var(--red);background:var(--red-bg);}
+.payout-total-line{display:flex;justify-content:space-between;font-size:12px;padding-top:8px;margin-top:4px;border-top:1px solid var(--border-hi);}
+.payout-total-line span:last-child{font-family:var(--mono);font-weight:500;color:var(--green);}
+
+/* Summary page payout section */
+.payout-summary-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--rl);padding:16px;}
+.payout-summary-card h3{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.ps-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.ps-row:last-child{border-bottom:none;}
+.ps-row .ps-val{font-family:var(--mono);font-weight:500;}
+.month-bar-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;}
+.month-bar-row .mb-label{width:80px;color:var(--t3);font-family:var(--mono);white-space:nowrap;}
+.month-bar-row .mb-bg{flex:1;height:16px;background:var(--border);border-radius:4px;overflow:hidden;}
+.month-bar-row .mb-fill{height:100%;background:var(--green);border-radius:4px;transition:width .4s;}
+.month-bar-row .mb-val{width:90px;text-align:right;font-family:var(--mono);color:var(--green);font-weight:500;}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -173,6 +204,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px
     <div class="nav-lbl">Pages</div>
     <button class="nav-btn active" data-page="accounts"><span class="nav-icon">⊞</span><span>Accounts</span></button>
     <button class="nav-btn" data-page="summary"><span class="nav-icon">◈</span><span>Summary</span></button>
+    <button class="nav-btn" data-page="payouts"><span class="nav-icon">↑</span><span>Payouts</span></button>
   </div>
   <div class="sidebar-footer" id="sidebar-footer">0 accounts</div>
 </nav>
@@ -221,6 +253,33 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px
     </div>
     <div class="kpi-strip" id="sum-kpi-strip"></div>
     <div id="sum-by-firm"></div>
+  </div>
+
+  <!-- PAYOUTS PAGE -->
+  <div class="page" id="page-payouts">
+    <div class="page-header">
+      <h1>Payouts</h1>
+      <p>Track realized income across all prop firms</p>
+    </div>
+    <div class="kpi-strip" id="payout-kpi-strip"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:24px;">
+      <div class="payout-summary-card">
+        <h3>Payouts by firm</h3>
+        <div id="payout-by-firm"></div>
+      </div>
+      <div class="payout-summary-card">
+        <h3>Payouts by month</h3>
+        <div id="payout-by-month"></div>
+      </div>
+    </div>
+    <div class="payout-summary-card">
+      <h3>Pending — accounts ready to withdraw now</h3>
+      <div id="payout-pending"></div>
+    </div>
+    <div class="payout-summary-card" style="margin-top:16px;">
+      <h3>All payout history</h3>
+      <div id="payout-all-history"></div>
+    </div>
   </div>
 
 </main>
@@ -274,6 +333,16 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px
       <div class="modal-field" id="f-wdafter-wrap" style="display:none">
         <label>Balance after withdrawal ($)</label>
         <input type="number" id="m-wdafter" placeholder="e.g. 26700" step="0.01"/>
+      </div>
+      <div class="modal-field" id="f-split-wrap" style="display:none">
+        <label>Profit split (your %)</label>
+        <select id="m-split">
+          <option value="100">100%</option>
+          <option value="90">90%</option>
+          <option value="80" selected>80%</option>
+          <option value="70">70%</option>
+          <option value="50">50%</option>
+        </select>
       </div>
     </div>
     <div class="modal-actions">
@@ -465,11 +534,58 @@ function renderCardBody(a) {
     <div class="field">
       <label>Balance after withdrawal ($)</label>
       <input class="mono-input" type="number" step="0.01" value="${a.wdafter||''}" id="e-wdafter-${a.id}" placeholder="e.g. 26700"/>
+    </div>
+    <div class="field">
+      <label>Profit split (your %)</label>
+      <select id="e-split-${a.id}">
+        <option value="100" ${a.split==100?'selected':''}>100%</option>
+        <option value="90"  ${a.split==90 ?'selected':''}>90%</option>
+        <option value="80"  ${(!a.split||a.split==80)?'selected':''}>80%</option>
+        <option value="70"  ${a.split==70 ?'selected':''}>70%</option>
+        <option value="50"  ${a.split==50 ?'selected':''}>50%</option>
+      </select>
     </div>` : `
     <div class="field">
       <label>Eval target ($)</label>
       <input class="mono-input" type="number" step="0.01" value="${a.target||''}" id="e-target-${a.id}" placeholder="e.g. 26500"/>
     </div>`;
+
+  const isReady = a.phase === 'funded' && a.balance >= a.target;
+  const payouts = a.payouts || [];
+  const payoutTotal = payouts.reduce((s,p) => s + p.amount, 0);
+  const payoutTake  = payouts.reduce((s,p) => s + (p.amount * (p.split||80)/100), 0);
+
+  const payoutSection = a.phase === 'funded' ? `
+    <div class="payout-box ${isReady?'ready-box':''}">
+      <h4>${isReady ? '💰 Ready to withdraw' : 'Log a payout'} ${isReady?`<span class="ready-pill">balance ≥ trigger</span>`:''}</h4>
+      <div class="payout-form">
+        <div class="field">
+          <label>Payout amount ($)</label>
+          <input type="number" step="0.01" id="po-amt-${a.id}" placeholder="e.g. 1000"/>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="po-date-${a.id}" value="${new Date().toISOString().split('T')[0]}"/>
+        </div>
+        <div class="field">
+          <label>Balance after payout ($)</label>
+          <input type="number" step="0.01" id="po-after-${a.id}" placeholder="e.g. 26700"/>
+        </div>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="logPayout('${a.id}')">Log payout</button>
+      ${payouts.length ? `
+      <div class="payout-history">
+        ${payouts.slice().reverse().map(p => `
+          <div class="payout-hist-row">
+            <div class="ph-date">${p.date}</div>
+            <div class="ph-amt">${fmt(p.amount)}</div>
+            <div class="ph-split">${p.split||80}% → you keep ${fmt(p.amount*(p.split||80)/100)}</div>
+            <div class="ph-del"><button onclick="deletePayout('${a.id}','${p.id}')">✕</button></div>
+          </div>`).join('')}
+        <div class="payout-total-line"><span>Total paid out (this account)</span><span>${fmt(payoutTotal)}</span></div>
+        <div class="payout-total-line"><span>Your take (after split)</span><span>${fmt(payoutTake)}</span></div>
+      </div>` : ''}
+    </div>` : '';
 
   return `
     <!-- Projection -->
@@ -513,7 +629,10 @@ function renderCardBody(a) {
       <div><span style="color:var(--t3)">Progress: </span><span style="font-family:var(--mono);font-weight:500;color:var(--${getColor(a)})">${getPct(a).toFixed(2)}%</span></div>
       ${a.phase==='funded'&&a.floor?`<div><span style="color:var(--t3)">Floor: </span><span style="font-family:var(--mono)">${fmt(a.floor)}</span></div>`:''}
       ${a.phase==='funded'&&a.wdafter?`<div><span style="color:var(--t3)">After withdrawal: </span><span style="font-family:var(--mono)">${fmt(a.wdafter)}</span></div>`:''}
+      ${a.phase==='funded'&&a.split?`<div><span style="color:var(--t3)">Split: </span><span style="font-family:var(--mono)">${a.split}% you</span></div>`:''}
     </div>
+
+    ${payoutSection}
 
     <!-- Actions -->
     <div class="acct-body-actions">
@@ -555,6 +674,7 @@ window.saveCardEdit = function(id) {
   const newProj  = parseFloat(document.getElementById('e-proj-'+id)?.value) || null;
   const newFloor = parseFloat(document.getElementById('e-floor-'+id)?.value) || null;
   const newWdafter=parseFloat(document.getElementById('e-wdafter-'+id)?.value) || null;
+  const newSplit = parseFloat(document.getElementById('e-split-'+id)?.value) || a.split || 80;
 
   if (!newId || !newFirm || isNaN(newStart) || isNaN(newBal) || isNaN(newTarget)) {
     const fb = document.getElementById('fb-'+id);
@@ -573,6 +693,7 @@ window.saveCardEdit = function(id) {
   a.dailyProj = newProj;
   a.floor   = newFloor;
   a.wdafter = newWdafter;
+  a.split   = newSplit;
   if (expandedId === oldId) expandedId = newId;
 
   save();
@@ -598,12 +719,16 @@ window.upgradeToFunded = function(id) {
   if (after === null) return;
   const floor   = prompt('Floor (locked drawdown) ($):', '');
   if (floor === null) return;
+  const split   = prompt('Profit split — your % (e.g. 80 or 90):', a.split || 80);
+  if (split === null) return;
 
   a.phase   = 'funded';
   a.balance = newBal;
   a.target  = parseFloat(trigger) || newTarget;
   a.wdafter = parseFloat(after)   || null;
   a.floor   = parseFloat(floor)   || null;
+  a.split   = parseFloat(split)   || 80;
+  if (!a.payouts) a.payouts = [];
   save();
   renderAccounts();
 };
@@ -615,6 +740,51 @@ window.removeAccount = function(id) {
   if (!confirm(`Remove account ${a.id} (${a.firm})? This cannot be undone.`)) return;
   accounts = accounts.filter(x => x.id !== id);
   if (expandedId === id) expandedId = null;
+  save();
+  renderAccounts();
+  renderSummary();
+};
+
+// ─── Payouts ──────────────────────────────────────────────────────────────────
+window.logPayout = function(id) {
+  const a = accounts.find(x => x.id === id);
+  if (!a) return;
+  const amtInput   = document.getElementById('po-amt-'+id);
+  const dateInput  = document.getElementById('po-date-'+id);
+  const afterInput = document.getElementById('po-after-'+id);
+
+  const amount = parseFloat(amtInput?.value);
+  const date   = dateInput?.value || new Date().toISOString().split('T')[0];
+  const after  = parseFloat(afterInput?.value);
+
+  if (isNaN(amount) || amount <= 0) {
+    alert('Enter a valid payout amount.'); return;
+  }
+  if (isNaN(after)) {
+    alert('Enter the balance after the payout.'); return;
+  }
+
+  if (!a.payouts) a.payouts = [];
+  a.payouts.push({
+    id: uid(),
+    date,
+    amount,
+    split: a.split || 80,
+    balanceBefore: a.balance,
+    balanceAfter: after,
+  });
+  a.balance = after;
+
+  save();
+  renderAccounts();
+  renderSummary();
+};
+
+window.deletePayout = function(accountId, payoutId) {
+  const a = accounts.find(x => x.id === accountId);
+  if (!a || !a.payouts) return;
+  if (!confirm('Delete this payout record? This will NOT restore the account balance.')) return;
+  a.payouts = a.payouts.filter(p => p.id !== payoutId);
   save();
   renderAccounts();
   renderSummary();
@@ -636,7 +806,7 @@ function updateFirmSuggestions() {
 }
 
 function showFundedFields(show) {
-  ['funded-section','f-floor-wrap','f-wdtrigger-wrap','f-wdafter-wrap'].forEach(id => {
+  ['funded-section','f-floor-wrap','f-wdtrigger-wrap','f-wdafter-wrap','f-split-wrap'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = show ? '' : 'none';
   });
@@ -661,6 +831,7 @@ window.openAddModal = function() {
   document.getElementById('m-floor').value   = '';
   document.getElementById('m-wdtrigger').value = '';
   document.getElementById('m-wdafter').value   = '';
+  document.getElementById('m-split').value     = '80';
   document.getElementById('modal-err').textContent = '';
   showFundedFields(false);
   updateFirmSuggestions();
@@ -683,6 +854,7 @@ window.openEditModal = function(id) {
   document.getElementById('m-floor').value   = a.floor   || '';
   document.getElementById('m-wdtrigger').value = a.phase==='funded' ? a.target : '';
   document.getElementById('m-wdafter').value   = a.wdafter || '';
+  document.getElementById('m-split').value     = a.split || 80;
   document.getElementById('modal-err').textContent = '';
   showFundedFields(a.phase === 'funded');
   updateFirmSuggestions();
@@ -708,6 +880,7 @@ document.getElementById('modal-save').addEventListener('click', () => {
   const target  = parseFloat(document.getElementById('m-target').value);
   const floor   = parseFloat(document.getElementById('m-floor').value)   || null;
   const wdafter = parseFloat(document.getElementById('m-wdafter').value) || null;
+  const split   = parseFloat(document.getElementById('m-split').value)   || 80;
   const err     = document.getElementById('modal-err');
 
   if (!firm)             { err.textContent='Firm name is required.';      return; }
@@ -730,14 +903,16 @@ document.getElementById('modal-save').addEventListener('click', () => {
       a.target  = target;
       a.floor   = floor;
       a.wdafter = wdafter;
+      a.split   = split;
       if (expandedId === editingId) expandedId = id;
     }
   } else {
     accounts.push({
       id, firm, phase, start,
       balance: isNaN(balance) ? start : balance,
-      target, floor, wdafter,
+      target, floor, wdafter, split,
       dailyProj: null,
+      payouts: [],
     });
   }
 
@@ -837,6 +1012,114 @@ function renderSummary() {
   }).join('');
 }
 
+// ─── Payouts page ─────────────────────────────────────────────────────────────
+function getAllPayouts() {
+  // Flatten all payouts with account/firm context attached
+  const all = [];
+  accounts.forEach(a => {
+    (a.payouts || []).forEach(p => {
+      all.push({ ...p, accountId: a.id, firm: a.firm });
+    });
+  });
+  return all.sort((x,y) => y.date.localeCompare(x.date));
+}
+
+function renderPayouts() {
+  const allPayouts = getAllPayouts();
+  const totalGross = allPayouts.reduce((s,p) => s + p.amount, 0);
+  const totalTake  = allPayouts.reduce((s,p) => s + (p.amount * (p.split||80)/100), 0);
+  const firmsFee   = totalGross - totalTake;
+  const pendingAccts = accounts.filter(a => a.phase === 'funded' && a.balance >= a.target);
+  const pendingTotal = pendingAccts.reduce((s,a) => s + (a.balance - a.start), 0);
+
+  document.getElementById('payout-kpi-strip').innerHTML = `
+    <div class="kpi"><div class="kl">Total paid out</div><div class="kv green">${fmt(totalGross)}</div><div class="ks">gross, all firms</div></div>
+    <div class="kpi"><div class="kl">Your take</div><div class="kv green">${fmt(totalTake)}</div><div class="ks">after profit splits</div></div>
+    <div class="kpi"><div class="kl">Firms' cut</div><div class="kv amber">${fmt(firmsFee)}</div><div class="ks">retained by firms</div></div>
+    <div class="kpi"><div class="kl">Payouts logged</div><div class="kv">${allPayouts.length}</div><div class="ks">total transactions</div></div>
+    <div class="kpi"><div class="kl">Ready now</div><div class="kv ${pendingAccts.length>0?'green':'blue'}">${pendingAccts.length}</div><div class="ks">accounts at trigger</div></div>
+  `;
+
+  // By firm
+  const firms = getFirms();
+  if (!firms.length || !allPayouts.length) {
+    document.getElementById('payout-by-firm').innerHTML = `<div style="font-size:12px;color:var(--t3);padding:8px 0;">No payouts logged yet.</div>`;
+  } else {
+    document.getElementById('payout-by-firm').innerHTML = firms.map(firm => {
+      const fp = allPayouts.filter(p => p.firm === firm);
+      if (!fp.length) return '';
+      const total = fp.reduce((s,p) => s+p.amount, 0);
+      const take  = fp.reduce((s,p) => s + (p.amount*(p.split||80)/100), 0);
+      return `<div class="ps-row"><span>${firm} <span style="color:var(--t3);font-size:11px;">(${fp.length})</span></span><span class="ps-val green">${fmt(total)} <span style="color:var(--t3);font-size:11px;">→ you: ${fmt(take)}</span></span></div>`;
+    }).join('') || `<div style="font-size:12px;color:var(--t3);padding:8px 0;">No payouts logged yet.</div>`;
+  }
+
+  // By month
+  if (!allPayouts.length) {
+    document.getElementById('payout-by-month').innerHTML = `<div style="font-size:12px;color:var(--t3);padding:8px 0;">No payouts logged yet.</div>`;
+  } else {
+    const byMonth = {};
+    allPayouts.forEach(p => {
+      const mk = p.date.slice(0,7); // YYYY-MM
+      byMonth[mk] = (byMonth[mk]||0) + p.amount;
+    });
+    const months = Object.keys(byMonth).sort((a,b) => b.localeCompare(a));
+    const maxVal  = Math.max(...Object.values(byMonth));
+    document.getElementById('payout-by-month').innerHTML = months.map(mk => {
+      const val = byMonth[mk];
+      const pct = maxVal > 0 ? (val/maxVal)*100 : 0;
+      const label = new Date(mk+'-01T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'});
+      return `<div class="month-bar-row">
+        <div class="mb-label">${label}</div>
+        <div class="mb-bg"><div class="mb-fill" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="mb-val">${fmt(val)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Pending
+  if (!pendingAccts.length) {
+    document.getElementById('payout-pending').innerHTML = `<div style="font-size:12px;color:var(--t3);padding:8px 0;">No accounts are currently at their withdrawal trigger.</div>`;
+  } else {
+    document.getElementById('payout-pending').innerHTML = pendingAccts.map(a => {
+      const pnl = a.balance - a.start;
+      return `<div class="ps-row">
+        <span>${a.firm} · <span style="font-family:var(--mono);font-size:12px;">${a.id}</span></span>
+        <span class="ps-val green">${fmt(a.balance)} <span style="color:var(--t3);font-size:11px;">(+${fmt(pnl)})</span></span>
+      </div>`;
+    }).join('') + `<div class="payout-total-line"><span>Total available if withdrawn today</span><span>${fmt(pendingTotal)}</span></div>`;
+  }
+
+  // All history
+  if (!allPayouts.length) {
+    document.getElementById('payout-all-history').innerHTML = `<div class="empty"><div class="empty-icon">💸</div><p>No payouts logged yet. Log one from an expanded funded account card.</p></div>`;
+  } else {
+    document.getElementById('payout-all-history').innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:separate;border-spacing:0 3px;min-width:600px;">
+          <thead><tr style="border-bottom:1px solid var(--border);">
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:left;">Date</th>
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:left;">Firm</th>
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:left;">Account</th>
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:right;">Amount</th>
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:right;">Split</th>
+            <th style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;text-align:right;">You keep</th>
+          </tr></thead>
+          <tbody>
+            ${allPayouts.map(p => `<tr style="background:var(--s1);">
+              <td style="padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--t3);">${p.date}</td>
+              <td style="padding:8px 10px;font-size:12px;">${p.firm}</td>
+              <td style="padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--t2);">${p.accountId}</td>
+              <td style="padding:8px 10px;font-family:var(--mono);text-align:right;color:var(--green);font-weight:500;">${fmt(p.amount)}</td>
+              <td style="padding:8px 10px;font-family:var(--mono);text-align:right;font-size:11px;color:var(--t3);">${p.split||80}%</td>
+              <td style="padding:8px 10px;font-family:var(--mono);text-align:right;color:var(--green);">${fmt(p.amount*(p.split||80)/100)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+}
+
 // ─── Navigation ───────────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -845,6 +1128,7 @@ document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('page-'+btn.dataset.page).classList.add('active');
     if (btn.dataset.page === 'summary') renderSummary();
+    else if (btn.dataset.page === 'payouts') renderPayouts();
     else renderAccounts();
   });
 });
